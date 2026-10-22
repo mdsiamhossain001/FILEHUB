@@ -676,18 +676,64 @@ window.closeLightbox=()=>{$('lightbox').classList.remove('active');setTimeout(()
 $('lightboxClose').addEventListener('click',closeLightbox);
 $('lightbox').addEventListener('click',e=>{if(e.target===$('lightbox'))closeLightbox()});
 
-window.navigateTo=url=>{S.route=url;location.hash='#'+url;handleRoute()};
-window.handleProtectedNavigation=path=>S.user?navigateTo(path):showAuthModal();
-window.openModal=id=>$(id).classList.add('active');
-window.closeModal=id=>$(id).classList.remove('active');
-window.addEventListener('hashchange',()=>{const h=location.hash.substring(1);if(h){S.route=h;handleRoute()}});
+// ==================== ROUTING (Clean URL + Hash) ====================
+window.navigateTo = url => {
+  if (!url) url = '/';
+  if (!url.startsWith('/')) url = '/' + url;
+  S.route = url;
+  try {
+    history.pushState({}, '', url);
+  } catch(e) {
+    location.hash = '#' + url;
+  }
+  handleRoute();
+};
+
+window.handleProtectedNavigation = path => S.user ? navigateTo(path) : showAuthModal();
+window.openModal = id => $(id).classList.add('active');
+window.closeModal = id => $(id).classList.remove('active');
+
+// Handle browser back/forward
+window.addEventListener('popstate', () => {
+  S.route = null;
+  handleRoute();
+});
+
+// Handle legacy hash URLs (#/file/xyz)
+window.addEventListener('hashchange', () => {
+  const h = location.hash.substring(1);
+  if(h && h.startsWith('/')) {
+    // Redirect hash → clean URL
+    history.replaceState({}, '', h);
+    S.route = h;
+    handleRoute();
+  }
+});
 
 async function handleRoute(){
-  let path=S.route||'/';
-  if(location.hash.startsWith('#/'))path=location.hash.substring(1);
-  if(path.length>1&&path.endsWith('/'))path=path.slice(0,-1);
-  if(!S.loaded)await loadAllData();
+  let path = S.route || '/';
 
+  // Priority 1: hash route (#/file/xyz) → convert to clean path
+  if(location.hash.startsWith('#/')) {
+    path = location.hash.substring(1);
+    // Convert to clean URL
+    try { history.replaceState({}, '', path); } catch(e) {}
+  }
+  // Priority 2: clean pathname (/file/xyz, /profile, /upload, /banner/abc)
+  else if(location.pathname && location.pathname !== '/' && location.pathname !== '/index.html') {
+    path = location.pathname;
+  }
+  // Priority 3: fallback
+  else if(!S.route) {
+    path = '/';
+  }
+
+  if(path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+  if(!path.startsWith('/')) path = '/' + path;
+
+  if(!S.loaded) await loadAllData();
+
+  // Maintenance Mode check
   const maint = S.settings.maintenance || {};
   const isAdmin = S.userData?.isAdmin === true;
   if (maint.enabled === true && !isAdmin) {
@@ -695,11 +741,25 @@ async function handleRoute(){
     return;
   }
 
-  if(path==='/'||path==='')renderHome();
-  else if(path.startsWith('/file/')){const id=decodeURIComponent(path.split('/file/')[1]);if(id)renderDetail('file',id);else renderError('Not Found','File ID missing.')}
-  else if(path.startsWith('/banner/')){const id=path.split('/banner/')[1];if(id)renderDetail('banner',id);else renderError('Not Found','Banner ID missing.')}
-  else if(path==='/upload'){if(S.user)renderUpload();else{showAuthModal();renderHome()}}
-  else if(path==='/profile'){if(S.user)renderProfile();else{showAuthModal();renderHome()}}
+  if(path === '/' || path === '') renderHome();
+  else if(path.startsWith('/file/')) {
+    const id = decodeURIComponent(path.split('/file/')[1]);
+    if(id) renderDetail('file', id);
+    else renderError('Not Found', 'File ID missing.');
+  }
+  else if(path.startsWith('/banner/')) {
+    const id = decodeURIComponent(path.split('/banner/')[1]);
+    if(id) renderDetail('banner', id);
+    else renderError('Not Found', 'Banner ID missing.');
+  }
+  else if(path === '/upload') {
+    if(S.user) renderUpload();
+    else { showAuthModal(); renderHome(); }
+  }
+  else if(path === '/profile') {
+    if(S.user) renderProfile();
+    else { showAuthModal(); renderHome(); }
+  }
   else renderHome();
 }
 
