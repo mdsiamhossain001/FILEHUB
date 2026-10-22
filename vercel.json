@@ -1,11 +1,10 @@
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/admin/(.*)", "dest": "/admin.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/admin", "destination": "/FILEHUB.html" },
+    { "source": "/admin/:path*", "destination": "/FILEHUB.html" },
+    { "source": "/:path*", "destination": "/index.html" }
   ]
 }
