@@ -112,6 +112,17 @@ header{background:var(--surface);backdrop-filter:blur(20px);border-bottom:1px so
 .detail-title{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;color:var(--text-main);line-height:1.25;margin:0 0 16px 0;font-weight:700;letter-spacing:-.5px}
 .detail-meta-grid{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .detail-desc{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-lg);padding:28px 24px;margin-top:24px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;line-height:1.75;color:var(--text-main);font-size:.98rem}
+/* Description content images: predictable responsive layout on mobile and desktop */
+.detail-desc{width:100%;max-width:100%;min-width:0;box-sizing:border-box;overflow-wrap:anywhere;word-break:normal}
+.detail-desc p{max-width:100%;min-width:0}
+.detail-desc img{display:block;width:auto;max-width:100%;height:auto;max-height:680px;object-fit:contain;margin:18px auto;border-radius:16px;box-shadow:var(--shadow-sm)}
+.detail-desc p:has(> img:only-child){margin:18px 0;text-align:center}
+.detail-desc a,.detail-desc code{overflow-wrap:anywhere;word-break:break-word}
+.detail-desc table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse}
+.detail-desc iframe,.detail-desc video{display:block;width:100%;max-width:100%;aspect-ratio:16/9;height:auto;margin:18px auto;border:0;border-radius:14px}
+@media(min-width:768px){.detail-wrapper{max-width:1040px;margin:0 auto}.detail-desc{padding:32px 36px;margin-top:28px}.detail-desc img{max-width:min(100%,820px);max-height:720px}.carousel-wrap{max-width:100%;margin-left:auto;margin-right:auto}}
+@media(max-width:767px){.detail-desc{padding:22px 16px}.detail-desc img{max-height:480px;margin:14px auto;border-radius:12px}.detail-desc p:has(> img:only-child){margin:14px 0}}
+
 .detail-desc::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%)}
 .detail-desc h1,.detail-desc h2,.detail-desc h3{font-family:'Space Grotesk',sans-serif;color:var(--text-main);letter-spacing:-.3px;margin-top:1.4em;margin-bottom:.6em}
 .detail-desc h1{font-size:1.5rem;padding-bottom:12px;border-bottom:2px dashed var(--border)}
