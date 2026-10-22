@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FileHub Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+<style>
+:root{--primary:#6366f1;--primary-2:#8b5cf6;--primary-3:#ec4899;--primary-soft:#eef2ff;--primary-glow:rgba(99,102,241,.4);--accent:#f59e0b;--success:#10b981;--danger:#ef4444;--bg:#f8fafc;--bg-2:#eef2ff;--surface:#fff;--text-main:#0f172a;--text-sub:#64748b;--text-mute:#94a3b8;--border:#e2e8f0;--border-soft:#f1f5f9;--shadow-xs:0 1px 2px rgba(15,23,42,.04);--shadow-sm:0 2px 8px rgba(15,23,42,.06);--shadow-md:0 8px 24px rgba(15,23,42,.08);--shadow-lg:0 20px 50px rgba(15,23,42,.12);--shadow-glow:0 8px 24px rgba(99,102,241,.35)}
+[data-theme="dark"]{--primary:#818cf8;--primary-2:#a78bfa;--primary-3:#f472b6;--primary-soft:#1e293b;--primary-glow:rgba(129,140,248,.4);--bg:#0b1120;--bg-2:#0f172a;--surface:#1e293b;--text-main:#f8fafc;--text-sub:#94a3b8;--text-mute:#64748b;--border:#334155;--border-soft:#1e293b;--shadow-xs:0 1px 2px rgba(0,0,0,.3);--shadow-sm:0 2px 8px rgba(0,0,0,.4);--shadow-md:0 8px 24px rgba(0,0,0,.5);--shadow-lg:0 20px 50px rgba(0,0,0,.6)}
+*{box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-main);min-height:100vh;margin:0;transition:background .3s,color .3s}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;letter-spacing:-.3px;margin-top:0}
+h1{font-size:1.75rem;font-weight:700}h2{font-size:1.3rem;font-weight:700}h3{font-size:1.1rem;font-weight:700}
+.sidebar{width:270px;background:var(--surface);border-right:1px solid var(--border-soft);padding:20px;position:fixed;top:0;left:-270px;height:100vh;z-index:1000;transition:left .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar.open{left:0}
+@media(min-width:768px){.sidebar{left:0}.main-content{margin-left:270px}}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:999;display:none}
+.sidebar-overlay.active{display:block}
+.sidebar-header{display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-soft)}
+.sidebar-logo{width:42px;height:42px;border-radius:14px;object-fit:cover;box-shadow:var(--shadow-sm),0 0 0 2px var(--primary-soft)}
+.sidebar-title{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-section{font-size:.7rem;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:1px;padding:12px 15px 6px}
+.nav-link{display:flex;align-items:center;gap:12px;padding:11px 15px;border-radius:12px;color:var(--text-sub);font-weight:500;transition:all .2s;margin-bottom:4px;cursor:pointer;font-size:.92rem;user-select:none}
+.nav-link:hover{background:var(--primary-soft);color:var(--primary)}
+.nav-link.active{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:white;box-shadow:0 4px 16px var(--primary-glow)}
+.nav-link i{width:20px;text-align:center;font-size:1rem}
+.nav-badge{margin-left:auto;background:var(--danger);color:white;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:10px;min-width:20px;text-align:center}
+.nav-link.active .nav-badge{background:rgba(255,255,255,.3)}
+.main-content{padding:24px;min-height:100vh;transition:margin-left .3s}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:1.6rem;font-weight:700;display:flex;align-items:center;gap:12px}
+.page-title-icon{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary-2));display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;box-shadow:var(--shadow-glow)}
+.card{background:var(--surface);border-radius:18px;padding:22px;box-shadow:var(--shadow-sm);border:1px solid var(--border-soft);margin-bottom:20px}
+.card-title{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;margin:0 0 16px;display:flex;align-items:center;gap:10px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px}
+.stat-card{background:var(--surface);border-radius:18px;padding:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border-soft);position:relative;overflow:hidden;transition:all .25s}
+.stat-card::before{content:'';position:absolute;top:0;right:0;width:100px;height:100px;background:radial-gradient(circle at top right,var(--primary-soft),transparent 70%);opacity:.5}
+.stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--primary)}
+.stat-icon-wrap{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px;position:relative;z-index:1;box-shadow:var(--shadow-sm)}
+.stat-icon-wrap.blue{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white}
+.stat-icon-wrap.yellow{background:linear-gradient(135deg,#f59e0b,#f97316);color:white}
+.stat-icon-wrap.green{background:linear-gradient(135deg,#10b981,#34d399);color:white}
+.stat-icon-wrap.pink{background:linear-gradient(135deg,#ec4899,#f472b6);color:white}
+.stat-value{font-family:'Space Grotesk',sans-serif;font-size:1.9rem;font-weight:700;line-height:1;margin-bottom:4px;position:relative;z-index:1}
+.stat-label{font-size:.8rem;color:var(--text-sub);text-transform:uppercase;letter-spacing:.5px;font-weight:600;position:relative;z-index:1}
+.alert-banner{border-radius:16px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.alert-banner.warn{background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:4px solid var(--accent);color:#78350f}
+.alert-banner.info{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left:4px solid #3b82f6;color:#1e40af}
+.alert-banner.success{background:linear-gradient(135deg,#d1fae5,#a7f3d0);border-left:4px solid var(--success);color:#065f46}
+.alert-banner.danger{background:linear-gradient(135deg,#fee2e2,#fecaca);border-left:4px solid var(--danger);color:#991b1b}
+.alert-banner-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.alert-banner-content{flex:1;min-width:200px}
+.alert-banner-title{font-weight:700;font-size:.95rem;margin-bottom:2px}
+.alert-banner-sub{font-size:.82rem;opacity:.85}
+.btn{padding:10px 18px;border-radius:12px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-size:.88rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;white-space:nowrap}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:white;box-shadow:0 4px 16px var(--primary-glow)}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px var(--primary-glow)}
+.btn-danger{background:var(--danger);color:white}
+.btn-danger:hover:not(:disabled){background:#dc2626;transform:translateY(-1px)}
+.btn-success{background:var(--success);color:white}
+.btn-success:hover:not(:disabled){background:#059669;transform:translateY(-1px)}
+.btn-warning{background:var(--accent);color:white}
+.btn-warning:hover:not(:disabled){background:#d97706;transform:translateY(-1px)}
+.btn-ghost{background:var(--bg-2);color:var(--text-main);border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+.btn-sm{padding:6px 12px;font-size:.78rem;border-radius:10px}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:10px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-weight:600;margin-bottom:8px;font-size:.86rem;color:var(--text-main)}
+.form-input,.form-textarea,.form-select{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text-main);font-family:inherit;font-size:.92rem;transition:all .2s;outline:none}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-soft);background:var(--surface)}
+.checkbox-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-2);border-radius:12px;margin-bottom:16px}
+.checkbox-row input[type="checkbox"]{width:20px;height:20px;accent-color:var(--primary);cursor:pointer}
+.checkbox-row label{margin:0;cursor:pointer;font-weight:600}
+.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border-soft)}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;padding:12px 14px;background:var(--bg-2);color:var(--text-sub);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.data-table td{padding:14px;border-bottom:1px solid var(--border-soft);font-size:.88rem;vertical-align:middle}
+.data-table tbody tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover{background:var(--bg-2)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.badge-approved{background:#d1fae5;color:#065f46}
+.badge-pending{background:#fef3c7;color:#92400e}
+.badge-rejected{background:#fee2e2;color:#991b1b}
+.badge-active{background:#dbeafe;color:#1e40af}
+.badge-banned{background:#fee2e2;color:#991b1b}
+.badge-points{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#78350f;font-family:'Space Grotesk',sans-serif}
+[data-theme="dark"] .badge-approved{background:rgba(16,185,129,.2);color:#6ee7b7}
+[data-theme="dark"] .badge-pending{background:rgba(245,158,11,.2);color:#fde68a}
+[data-theme="dark"] .badge-rejected{background:rgba(239,68,68,.2);color:#fca5a5}
+[data-theme="dark"] .badge-active{background:rgba(59,130,246,.2);color:#93c5fd}
+[data-theme="dark"] .badge-banned{background:rgba(239,68,68,.2);color:#fca5a5}
+[data-theme="dark"] .badge-points{background:rgba(245,158,11,.2);color:#fde68a}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);z-index:2000;display:none;justify-content:center;align-items:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal-box{background:var(--surface);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;border-radius:20px;padding:28px;position:relative;animation:modalIn .35s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg)}
+@keyframes modalIn{from{opacity:0;transform:translateY(-40px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-close{position:absolute;top:16px;right:16px;cursor:pointer;font-size:1rem;color:var(--text-sub);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--bg-2);border:none;transition:all .2s}
+.modal-close:hover{background:var(--danger);color:white}
+.alert{padding:14px 16px;border-radius:12px;margin-bottom:16px;font-size:.88rem;font-weight:500;display:flex;align-items:center;gap:10px}
+.alert-success{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border-left:4px solid var(--success)}
+.alert-error{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#991b1b;border-left:4px solid var(--danger)}
+.alert-info{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e40af;border-left:4px solid #3b82f6}
+.alert-warn{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border-left:4px solid var(--accent)}
+.hidden{display:none!important}
+.flex{display:flex}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.items-start{align-items:flex-start}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.justify-end{justify-content:flex-end}
+.gap-1{gap:4px}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
+.text-center{text-align:center}.text-sm{font-size:.85rem}.text-xs{font-size:.75rem}.text-sub{color:var(--text-sub)}.text-main{color:var(--text-main)}
+.font-mono{font-family:'SF Mono',Menlo,monospace}.font-bold{font-weight:700}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.w-full{width:100%}
+.mb-2{margin-bottom:8px}.mb-4{margin-bottom:16px}.mb-6{margin-bottom:24px}.mt-4{margin-top:16px}.ml-auto{margin-left:auto}
+.hidden-sm{display:initial}
+@media(max-width:640px){.hidden-sm{display:none}.main-content{padding:16px}.page-title{font-size:1.3rem}h1{font-size:1.4rem}}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);position:relative;overflow:hidden}
+.login-wrap::before,.login-wrap::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
+.login-wrap::before{width:400px;height:400px;top:-150px;right:-150px}
+.login-wrap::after{width:300px;height:300px;bottom:-120px;left:-100px}
+.login-card{background:var(--surface);border-radius:24px;padding:36px 30px;max-width:420px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.25);position:relative;z-index:1}
+.login-logo{width:80px;height:80px;border-radius:22px;margin:0 auto 16px;display:block;box-shadow:var(--shadow-glow)}
+.login-title{text-align:center;font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;margin:0 0 6px;background:linear-gradient(135deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.login-subtitle{text-align:center;color:var(--text-sub);font-size:.9rem;margin-bottom:28px}
+.method-config-card{background:var(--bg-2);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid var(--border-soft)}
+.thumb-sm{width:56px;height:56px;object-fit:cover;border-radius:10px;border:2px solid var(--border-soft)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-mute)}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="login-section" class="login-wrap">
+    <div class="login-card">
+      <img src="https://iili.io/fY4mez7.jpg" class="login-logo" alt="FileHub">
+      <h2 class="login-title">FileHub Admin</h2>
+      <p class="login-subtitle">Sign in to control panel</p>
+      <div id="login-alert" class="alert hidden"></div>
+      <form id="login-form">
+        <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" class="form-input" placeholder="admin@filehub.com" required></div>
+        <div class="form-group"><label class="form-label">Password</label><input type="password" id="login-password" class="form-input" placeholder="••••••••" required></div>
+        <button type="submit" class="btn btn-primary w-full" id="login-btn" style="width:100%;padding:14px"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="admin-panel" class="hidden">
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="https://iili.io/fY4mez7.jpg" class="sidebar-logo" alt="FileHub">
+        <h1 class="sidebar-title">FileHub Admin</h1>
+        <button class="btn btn-ghost btn-icon hidden-md-up" onclick="toggleSidebar()" style="margin-left:auto;display:none"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="nav-section">Main</div>
+      <div class="nav-link active" data-page="dashboard" onclick="loadPage('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</div>
+      <div class="nav-link" data-page="files" onclick="loadPage('files')"><i class="fas fa-file-alt"></i> Files <span class="nav-badge hidden" id="files-pending-badge">0</span></div>
+      <div class="nav-link" data-page="user-prompts" onclick="loadPage('user-prompts')"><i class="fas fa-wand-magic-sparkles"></i> User Prompts <span class="nav-badge hidden" id="prompts-pending-badge">0</span></div>
+      <div class="nav-link" data-page="withdraw" onclick="loadPage('withdraw')"><i class="fas fa-wallet"></i> Withdraw <span class="nav-badge hidden" id="withdraw-pending-badge">0</span></div>
+      <div class="nav-section">Content</div>
+      <div class="nav-link" data-page="banners" onclick="loadPage('banners')"><i class="fas fa-image"></i> Sliders</div>
+      <div class="nav-link" data-page="ai-prompts" onclick="loadPage('ai-prompts')"><i class="fas fa-magic"></i> AI Prompts</div>
+      <div class="nav-section">Manage</div>
+      <div class="nav-link" data-page="users" onclick="loadPage('users')"><i class="fas fa-users"></i> Users</div>
+      <div class="nav-link" data-page="rewards" onclick="loadPage('rewards')"><i class="fas fa-coins"></i> Rewards</div>
+      <div class="nav-link" data-page="notifications" onclick="loadPage('notifications')"><i class="fas fa-bell"></i> Notifications</div>
+      <div class="nav-section">System</div>
+      <div class="nav-link" data-page="admin-info" onclick="loadPage('admin-info')"><i class="fas fa-user-shield"></i> Admin Info</div>
+      <div class="nav-link" data-page="settings" onclick="loadPage('settings')"><i class="fas fa-cog"></i> Settings</div>
+      <div class="nav-link" data-page="ai-settings" onclick="loadPage('ai-settings')"><i class="fas fa-robot"></i> AI Settings</div>
+      <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border-soft)">
+        <div class="nav-link" style="color:var(--danger)" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+      </div>
+    </aside>
+    <main class="main-content">
+      <div class="top-bar hidden-md-up" style="display:none">
+        <button class="btn btn-ghost btn-icon" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <h2>FileHub Admin</h2><div style="width:36px"></div>
+      </div>
+      <div id="page-content"></div>
+    </main>
+  </div>
+</div>
+
+<div id="item-modal" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <h3 id="modal-title" class="card-title"></h3>
+    <div id="modal-alert" class="alert hidden"></div>
+    <form id="modal-form"></form>
+  </div>
+</div>
+
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal-box" style="max-width:420px">
+    <h3 style="text-align:center;margin-bottom:12px">Confirm</h3>
+    <p id="confirm-message" class="text-center mb-6" style="color:var(--text-sub)"></p>
+    <div class="flex justify-center gap-3">
+      <button class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-action">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyAgblSHPL02TI8lyw5XBRJEi4y3lUOlqKQ",authDomain:"file-5dd84.firebaseapp.com",databaseURL:"https://file-5dd84-default-rtdb.firebaseio.com",projectId:"file-5dd84",storageBucket:"file-5dd84.firebasestorage.app",messagingSenderId:"425635065125",appId:"1:425635065125:web:a8ce55b1745f301bb5becc"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const refs={users:db.ref('users'),files:db.ref('files'),banners:db.ref('banners'),settings:db.ref('settings'),notifications:db.ref('notifications'),admins:db.ref('admins'),prompts:db.ref('user_ai_prompts'),withdraws:db.ref('withdraw_requests'),transactions:db.ref('transactions')};
+
+let currentUser=null,currentPage='dashboard';
+let allUsers=[],allFiles=[],allBanners=[],allPrompts=[],allWithdraws=[],allTx=[],appSettings={};
+
+auth.onAuthStateChanged(async (user)=>{
+  if(user){
+    try{
+      const adminSnap=await refs.admins.child(user.uid).once('value');
+      const userSnap=await refs.users.child(user.uid).once('value');
+      const isFlagAdmin=(userSnap.val()||{}).isAdmin===true;
+      if(adminSnap.exists()||isFlagAdmin){
+        currentUser=user;showAdminPanel();await loadData();
+      }else{
+        await auth.signOut();showLogin();showAlert('login-alert','Not authorized as admin','error');
+      }
+    }catch(err){
+      console.error(err);await auth.signOut();showLogin();showAlert('login-alert','Auth error: '+err.message,'error');
+    }
+  }else showLogin();
+});
+
+document.getElementById('login-form').addEventListener('submit',async (e)=>{
+  e.preventDefault();
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Signing in...';
+  try{await auth.signInWithEmailAndPassword(document.getElementById('login-email').value,document.getElementById('login-password').value)}
+  catch(err){showAlert('login-alert',err.message,'error');btn.disabled=false;btn.innerHTML='<i class="fas fa-sign-in-alt"></i> Sign In'}
+});
+
+function showLogin(){document.getElementById('login-section').classList.remove('hidden');document.getElementById('admin-panel').classList.add('hidden')}
+function showAdminPanel(){document.getElementById('login-section').classList.add('hidden');document.getElementById('admin-panel').classList.remove('hidden')}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('active')}
+
+async function loadData(){
+  try{
+    const [uSnap,fSnap,bSnap,pSnap,wSnap,sSnap,tSnap]=await Promise.all([
+      refs.users.once('value'),refs.files.once('value'),refs.banners.once('value'),
+      refs.prompts.once('value'),refs.withdraws.once('value'),refs.settings.once('value'),
+      refs.transactions.limitToLast(100).once('value')
+    ]);
+    allUsers=uSnap.val()?Object.entries(uSnap.val()).map(([id,v])=>({id,...v})):[];
+    allFiles=fSnap.val()?Object.entries(fSnap.val()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.created_at||0)-(a.created_at||0)):[];
+    allBanners=bSnap.val()?Object.entries(bSnap.val()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.created_at||0)-(a.created_at||0)):[];
+    allPrompts=pSnap.val()?Object.entries(pSnap.val()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.created_at||0)-(a.created_at||0)):[];
+    allWithdraws=wSnap.val()?Object.entries(wSnap.val()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)):[];
+    allTx=tSnap.val()?Object.values(tSnap.val()):[];
+    appSettings=sSnap.val()||{};
+    updateBadges();loadPage(currentPage);
+  }catch(err){
+    console.error(err);
+    document.getElementById('page-content').innerHTML=`<div class="card"><div class="alert alert-error">${err.message}</div><button class="btn btn-primary" onclick="loadData()">Retry</button></div>`;
+  }
+}
+
+function updateBadges(){
+  const pFiles=allFiles.filter(f=>f.status==='pending').length;
+  const pPrompts=allPrompts.filter(p=>p.status==='pending').length;
+  const pWd=allWithdraws.filter(w=>w.status==='pending').length;
+  toggleBadge('files-pending-badge',pFiles);
+  toggleBadge('prompts-pending-badge',pPrompts);
+  toggleBadge('withdraw-pending-badge',pWd);
+}
+function toggleBadge(id,count){const el=document.getElementById(id);if(!el)return;el.textContent=count;el.classList.toggle('hidden',count===0)}
+
+function loadPage(page){
+  currentPage=page;
+  document.querySelectorAll('.nav-link').forEach(l=>{l.classList.remove('active');if(l.dataset.page===page)l.classList.add('active')});
+  if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active')}
+  const pages={dashboard:renderDashboard,files:renderFiles,banners:renderBanners,'ai-prompts':renderAIPrompts,'user-prompts':renderUserPrompts,rewards:renderRewards,withdraw:renderWithdraw,users:renderUsers,'admin-info':renderAdminInfo,notifications:renderNotifications,settings:renderSettings,'ai-settings':renderAISettings};
+  (pages[page]||renderDashboard)();
+}
+
+async function logout(){await auth.signOut();location.reload()}
+
+function showAlert(id,msg,type='success'){
+  const a=document.getElementById(id);if(!a)return alert(msg);
+  a.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i> ${msg}`;
+  a.className='alert alert-'+type;a.classList.remove('hidden');
+  clearTimeout(a._t);a._t=setTimeout(()=>a.classList.add('hidden'),4000);
+}
+function openModal(){document.getElementById('item-modal').classList.add('active');document.getElementById('modal-alert').classList.add('hidden')}
+function closeModal(){document.getElementById('item-modal').classList.remove('active')}
+function openConfirmModal(msg,onConfirm){
+  document.getElementById('confirm-message').innerHTML=msg;
+  document.getElementById('confirm-modal').classList.add('active');
+  document.getElementById('confirm-action').onclick=async ()=>{
+    try{await onConfirm()}catch(e){alert('Failed: '+e.message);console.error(e)}
+    closeConfirmModal();
+  };
+}
+function closeConfirmModal(){document.getElementById('confirm-modal').classList.remove('active')}
+function esc(str){if(!str)return '';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+function fmtDate(ts){if(!ts)return 'N/A';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function genSlug(t){if(!t)return '';return t.toLowerCase().trim().replace(/[\u0980-\u09FF]/g,'').replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'').substring(0,60)}
+async function uniqueSlug(base,exclude){let s=base,c=1;while(c<=20){const snap=await refs.files.child(s).once('value');if(!snap.exists()||snap.key===exclude)return s;c++;s=base+'-'+c}return base+'-'+Date.now().toString().slice(-5)}
+function pageHeader(title,icon,actionHTML=''){return `<div class="top-bar"><div class="page-title"><div class="page-title-icon"><i class="fas fa-${icon}"></i></div><span>${title}</span></div>${actionHTML}</div>`}
+
+// ============ DASHBOARD ============
+function renderDashboard(){
+  const pFiles=allFiles.filter(f=>f.status==='pending').length;
+  const pPrompts=allPrompts.filter(p=>p.status==='pending').length;
+  const pWd=allWithdraws.filter(w=>w.status==='pending').length;
+  const totalBalance=allUsers.reduce((s,u)=>s+(u.balance||0),0);
+  const totalDownloads=allFiles.reduce((s,f)=>s+(f.total_downloads||0),0);
+  const maint=appSettings.maintenance||{};
+  const wdEnabled=(appSettings.withdraw||{}).enabled!==false;
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Dashboard','chart-line')}
+    ${maint.enabled?`<div class="alert-banner danger"><div class="alert-banner-icon"><i class="fas fa-tools"></i></div><div class="alert-banner-content"><div class="alert-banner-title">🚧 Maintenance Mode is ON</div><div class="alert-banner-sub">Users cannot access site. Only admin can.</div></div><button class="btn btn-danger btn-sm" onclick="loadPage('settings')">Manage</button></div>`:''}
+    ${!wdEnabled?`<div class="alert-banner warn"><div class="alert-banner-icon"><i class="fas fa-wallet"></i></div><div class="alert-banner-content"><div class="alert-banner-title">💸 Withdraw System is OFF</div><div class="alert-banner-sub">Users cannot request withdraw</div></div><button class="btn btn-warning btn-sm" onclick="loadPage('settings')">Manage</button></div>`:''}
+    ${pWd>0?`<div class="alert-banner warn"><div class="alert-banner-icon"><i class="fas fa-wallet"></i></div><div class="alert-banner-content"><div class="alert-banner-title">${pWd} withdraw request${pWd>1?'s':''} pending</div><div class="alert-banner-sub">Review and approve/reject</div></div><button class="btn btn-warning btn-sm" onclick="loadPage('withdraw')">Review</button></div>`:''}
+    ${pFiles>0?`<div class="alert-banner info"><div class="alert-banner-icon"><i class="fas fa-file-alt"></i></div><div class="alert-banner-content"><div class="alert-banner-title">${pFiles} file${pFiles>1?'s':''} pending approval</div><div class="alert-banner-sub">Approve করলে auto reward credit হবে</div></div><button class="btn btn-primary btn-sm" onclick="loadPage('files')">Review</button></div>`:''}
+    ${pPrompts>0?`<div class="alert-banner warn"><div class="alert-banner-icon"><i class="fas fa-magic"></i></div><div class="alert-banner-content"><div class="alert-banner-title">${pPrompts} prompt${pPrompts>1?'s':''} pending approval</div><div class="alert-banner-sub">Approve করলে user reward পাবে</div></div><button class="btn btn-warning btn-sm" onclick="loadPage('user-prompts')">Review</button></div>`:''}
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon-wrap blue"><i class="fas fa-users"></i></div><div class="stat-value">${allUsers.length}</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><div class="stat-icon-wrap green"><i class="fas fa-file-alt"></i></div><div class="stat-value">${allFiles.length}</div><div class="stat-label">Total Files</div></div>
+      <div class="stat-card"><div class="stat-icon-wrap pink"><i class="fas fa-download"></i></div><div class="stat-value">${totalDownloads}</div><div class="stat-label">Downloads</div></div>
+      <div class="stat-card"><div class="stat-icon-wrap yellow"><i class="fas fa-coins"></i></div><div class="stat-value">${totalBalance}</div><div class="stat-label">Total Points</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px">
+      <div class="card" style="margin:0"><h3 class="card-title"><i class="fas fa-file-alt" style="color:var(--primary)"></i> Recent Files</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Title</th><th>Status</th><th>Uploader</th></tr></thead><tbody>${allFiles.slice(0,5).map(f=>`<tr><td class="truncate" style="max-width:180px">${esc(f.title||'Untitled')}</td><td><span class="badge badge-${f.status||'pending'}">${f.status||'pending'}</span></td><td class="text-sm">${f.uploadedByEmail?esc(f.uploadedByEmail.split('@')[0]):'Admin'}</td></tr>`).join('')||'<tr><td colspan="3" class="text-center text-sub" style="padding:30px">No files yet</td></tr>'}</tbody></table></div></div>
+      <div class="card" style="margin:0"><h3 class="card-title"><i class="fas fa-wallet" style="color:var(--accent)"></i> Recent Withdrawals</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>User</th><th>Amount</th><th>Taka</th><th>Status</th></tr></thead><tbody>${allWithdraws.slice(0,5).map(w=>`<tr><td class="truncate" style="max-width:140px">${esc(w.userEmail||w.userId||'')}</td><td><span class="badge badge-points">${w.amount} pts</span></td><td class="font-bold" style="color:var(--success)">৳${w.takaAmount||0}</td><td><span class="badge badge-${w.status==='approved'?'approved':w.status==='rejected'?'rejected':'pending'}">${w.status}</span></td></tr>`).join('')||'<tr><td colspan="4" class="text-center text-sub" style="padding:30px">No withdrawals yet</td></tr>'}</tbody></table></div></div>
+    </div>`;
+}
+
+// ============ FILES ============
+function renderFiles(){
+  const rows=allFiles.map(f=>{
+    const isCustom=!f.id.startsWith('-');
+    return `<tr>
+      <td style="max-width:240px"><div class="flex items-center gap-2"><img src="${esc(f.thumbnail_url||'')}" style="width:40px;height:40px;border-radius:8px;object-fit:cover" onerror="this.style.display='none'"><span class="truncate font-bold">${esc(f.title||'Untitled')}</span></div></td>
+      <td><code class="text-xs" style="color:${isCustom?'var(--success)':'var(--text-sub)'}">/file/${esc(f.id)}</code></td>
+      <td><span class="badge badge-${f.status||'pending'}">${f.status||'pending'}</span></td>
+      <td><span class="badge badge-points">${f.required_ads||0} ads</span></td>
+      <td class="font-bold">${f.total_downloads||0}</td>
+      <td class="text-sm">${f.uploadedByEmail?esc(f.uploadedByEmail.split('@')[0]):'Admin'}</td>
+      <td><div class="flex gap-1 flex-wrap">
+        ${f.download_url?`<a href="${esc(f.download_url)}" target="_blank" class="btn btn-ghost btn-sm btn-icon" title="Visit"><i class="fas fa-external-link-alt"></i></a>`:''}
+        ${f.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveFile('${f.id}')"><i class="fas fa-check"></i></button>`:''}
+        ${f.status==='pending'?`<button class="btn btn-danger btn-sm" onclick="rejectFile('${f.id}')"><i class="fas fa-times"></i></button>`:''}
+        <button class="btn btn-warning btn-sm btn-icon" onclick="editFile('${f.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteFile('${f.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`;}).join('')||'<tr><td colspan="7" class="text-center text-sub" style="padding:40px">No files yet</td></tr>';
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Files','file-alt',`<button class="btn btn-primary" onclick="openFileForm()"><i class="fas fa-plus"></i> Add File</button>`)}
+    <div class="alert-banner info"><div class="alert-banner-icon"><i class="fas fa-info-circle"></i></div><div class="alert-banner-content"><div class="alert-banner-title">Approve + Reward</div><div class="alert-banner-sub">Approve করলে uploader auto reward পাবে (Rewards page-এ সেট করা)</div></div></div>
+    <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>File</th><th>Slug</th><th>Status</th><th>Ads</th><th>DL</th><th>Uploader</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+
+async function approveFile(fileId){
+  const file=allFiles.find(f=>f.id===fileId);if(!file)return;
+  const rw=appSettings.rewards||{};const rewardAmt=Number(rw.file_approve)||50;
+  document.getElementById('modal-title').innerHTML='<i class="fas fa-check-circle" style="color:var(--success)"></i> Approve File';
+  document.getElementById('modal-form').innerHTML=`
+    <div style="background:var(--bg-2);padding:16px;border-radius:14px;margin-bottom:18px"><div class="flex gap-3 items-center">
+      ${file.thumbnail_url?`<img src="${esc(file.thumbnail_url)}" style="width:70px;height:70px;border-radius:12px;object-fit:cover">`:''}
+      <div><div style="font-weight:700;font-size:1rem;margin-bottom:4px">${esc(file.title||'Untitled')}</div>
+      <div class="text-sm text-sub">${esc(file.uploadedByEmail||'Unknown')}</div>
+      <div class="text-sm text-sub">Ext: ${esc(file.file_extension||'file')}</div></div></div></div>
+    ${rewardAmt>0?`<div class="alert alert-info"><i class="fas fa-coins"></i> Reward: <strong>+${rewardAmt} points</strong> credited to uploader</div>`:''}
+    <div class="form-group"><label class="form-label">Required Ads Steps</label><input type="number" id="ap-steps" class="form-input" value="${file.required_ads||0}" min="0"><p class="text-xs text-sub" style="margin-top:6px">0 = free, 1+ = ads watch</p></div>
+    <div class="form-group"><label class="form-label">Custom Slug (Optional)</label><input type="text" id="ap-slug" class="form-input" value="${esc(file.id)}" placeholder="my-file-name"><p class="text-xs text-sub" style="margin-top:6px">URL: /file/<span id="ap-slug-preview">${esc(file.id)}</span></p></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-success" id="ap-btn"><i class="fas fa-check"></i> Approve ${rewardAmt>0?`& +${rewardAmt} pts`:''}</button></div>`;
+  document.getElementById('ap-slug').addEventListener('input',function(){document.getElementById('ap-slug-preview').textContent=this.value.trim()||'auto'});
+  document.getElementById('modal-form').onsubmit=async (e)=>{
+    e.preventDefault();
+    const btn=document.getElementById('ap-btn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Approving...';
+    const newSlug=document.getElementById('ap-slug').value.trim()||file.id;
+    const steps=parseInt(document.getElementById('ap-steps').value)||0;
+    try{
+      if(newSlug!==file.id){
+        const data={...file,status:'approved',required_ads:steps,approved_at:Date.now()};delete data.id;
+        const unique=await uniqueSlug(newSlug,file.id);
+        await refs.files.child(unique).set(data);await refs.files.child(file.id).remove();
+      }else{await refs.files.child(file.id).update({status:'approved',required_ads:steps,approved_at:Date.now()})}
+      if(file.uploadedBy&&!file.reward_credited&&rewardAmt>0){
+        await refs.users.child(file.uploadedBy).child('balance').transaction(b=>(b||0)+rewardAmt);
+        await refs.users.child(file.uploadedBy).child('totalEarnings').transaction(b=>(b||0)+rewardAmt);
+        await refs.transactions.push({userId:file.uploadedBy,type:'file_approve',amount:rewardAmt,itemId:file.id,itemTitle:file.title,createdAt:Date.now()});
+        await refs.files.child(file.id).update({reward_credited:true});
+      }
+      if(file.uploadedBy){
+        await refs.notifications.push({title:`✅ File Approved${rewardAmt>0?` +${rewardAmt} pts`:''}`,decs:`Your file **"${file.title}"** has been approved!\n\n${rewardAmt>0?`💰 Reward: **+${rewardAmt} points** credited.`:'📁 File is now live.'}\n\n🔓 Ads required: ${steps}`,created_at:Date.now(),is_read:false,target_uid:file.uploadedBy});
+      }
+      closeModal();await loadData();
+    }catch(err){showAlert('modal-alert',err.message,'error');btn.disabled=false;btn.innerHTML='<i class="fas fa-check"></i> Approve'}
+  };
+  openModal();
+}
+
+async function rejectFile(fileId){
+  const file=allFiles.find(f=>f.id===fileId);if(!file)return;
+  openConfirmModal(`Reject file <strong>"${esc(file.title)}"</strong>?<br><span class="text-sm text-sub">User will be notified.</span>`,async ()=>{
+    await refs.files.child(fileId).update({status:'rejected',rejected_at:Date.now()});
+    if(file.uploadedBy){await refs.notifications.push({title:'❌ File Rejected',decs:`Your file **"${file.title}"** was rejected by admin.`,created_at:Date.now(),is_read:false,target_uid:file.uploadedBy})}
+    await loadData();
+  });
+}
+
+function openFileForm(fileId){
+  const file=fileId?allFiles.find(f=>f.id===fileId):{};
+  if(fileId&&!file){alert('Not found');return}
+  document.getElementById('modal-title').innerHTML=fileId?'<i class="fas fa-edit" style="color:var(--primary)"></i> Edit File':'<i class="fas fa-plus-circle" style="color:var(--primary)"></i> Add New File';
+  const slugInit=fileId&&!file.id.startsWith('-')?file.id:'';
+  document.getElementById('modal-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Title *</label><input type="text" id="fl-title" class="form-input" value="${esc(file.title||'')}" oninput="autoSlug()" required></div>
+    <div class="form-group"><label class="form-label">URL Slug (Optional)</label><input type="text" id="fl-slug" class="form-input" value="${esc(slugInit)}" placeholder="my-custom-slug"><p class="text-xs text-sub" style="margin-top:6px">/file/<span id="fl-slug-preview">${esc(slugInit||'auto')}</span></p></div>
+    <div class="form-group"><label class="form-label">Description (Markdown)</label><textarea id="fl-desc" class="form-textarea" rows="6" required>${esc(file.description||'')}</textarea></div>
+    <div class="form-group"><label class="form-label">Thumbnail URL *</label><input type="url" id="fl-thumb" class="form-input" value="${esc(file.thumbnail_url||'')}" required></div>
+    <div class="form-group"><label class="form-label">Download URL *</label><input type="url" id="fl-dl" class="form-input" value="${esc(file.download_url||'')}" required></div>
+    <div class="flex gap-3">
+      <div class="form-group" style="flex:1"><label class="form-label">Extension</label><input type="text" id="fl-ext" class="form-input" value="${esc(file.file_extension||'.zip')}" required></div>
+      <div class="form-group" style="flex:1"><label class="form-label">Ads Steps</label><input type="number" id="fl-steps" class="form-input" value="${file.required_ads||0}" min="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Detail Photos (one per line)</label><textarea id="fl-photos" class="form-textarea" rows="3" style="font-family:monospace;font-size:.85rem">${esc((file.detail_photos||[]).join('\n'))}</textarea></div>
+    <div class="form-group"><label class="form-label">Status</label><select id="fl-status" class="form-select">
+      <option value="approved" ${file.status==='approved'||!fileId?'selected':''}>✅ Approved</option>
+      <option value="pending" ${file.status==='pending'?'selected':''}>⏳ Pending</option>
+      <option value="rejected" ${file.status==='rejected'?'selected':''}>❌ Rejected</option>
+    </select></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary" id="fl-btn"><i class="fas fa-save"></i> Save</button></div>`;
+  setTimeout(()=>{const slugEl=document.getElementById('fl-slug');if(slugEl)slugEl.dataset.edited=slugInit?'true':'false';updateFlSlugPreview()},50);
+  document.getElementById('fl-slug').addEventListener('input',updateFlSlugPreview);
+  document.getElementById('modal-form').onsubmit=(e)=>saveFile(e,fileId);
+  openModal();
+}
+function autoSlug(){const s=document.getElementById('fl-slug');const t=document.getElementById('fl-title');if(!s||!t)return;if(s.dataset.edited==='true')return;s.value=genSlug(t.value);updateFlSlugPreview()}
+function updateFlSlugPreview(){const s=document.getElementById('fl-slug');const p=document.getElementById('fl-slug-preview');if(!s||!p)return;s.dataset.edited='true';p.textContent=s.value.trim()||'auto'}
+async function saveFile(e,fileId){
+  e.preventDefault();
+  const btn=document.getElementById('fl-btn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Saving...';
+  const existing=fileId?allFiles.find(f=>f.id===fileId):{};
+  const title=document.getElementById('fl-title').value.trim();
+  const customSlug=document.getElementById('fl-slug').value.trim();
+  let base=customSlug||genSlug(title)||'file-'+Date.now().toString().slice(-8);
+  let finalSlug=base;
+  if(!fileId||(existing.id&&existing.id!==base))finalSlug=await uniqueSlug(base,fileId);
+  const data={title,description:document.getElementById('fl-desc').value,thumbnail_url:document.getElementById('fl-thumb').value,download_url:document.getElementById('fl-dl').value,file_extension:document.getElementById('fl-ext').value,required_ads:parseInt(document.getElementById('fl-steps').value)||0,detail_photos:document.getElementById('fl-photos').value.split('\n').map(u=>u.trim()).filter(u=>u),status:document.getElementById('fl-status').value,created_at:existing.created_at||Date.now(),total_downloads:existing.total_downloads||0,uploadedBy:existing.uploadedBy||currentUser.uid,uploadedByEmail:existing.uploadedByEmail||currentUser.email};
+  try{
+    if(fileId){if(existing.id!==finalSlug){await refs.files.child(finalSlug).set(data);await refs.files.child(existing.id).remove()}else await refs.files.child(fileId).update(data)}
+    else await refs.files.child(finalSlug).set(data);
+    closeModal();await loadData();
+  }catch(err){showAlert('modal-alert',err.message,'error');btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> Save'}
+}
+function editFile(id){openFileForm(id)}
+function deleteFile(id){const f=allFiles.find(x=>x.id===id);openConfirmModal(`Delete <strong>"${esc(f?f.title:id)}"</strong> permanently?`,async ()=>{await refs.files.child(id).remove();await loadData()})}
+
+// ============ REWARDS ============
+function renderRewards(){
+  const rw=appSettings.rewards||{};
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Rewards','coins')}
+    <div class="alert-banner info"><div class="alert-banner-icon"><i class="fas fa-lightbulb"></i></div><div class="alert-banner-content"><div class="alert-banner-title">Auto point distribution</div><div class="alert-banner-sub">এই reward গুলো ইউজার প্যানেলে সরাসরি credit হবে</div></div></div>
+    <div id="rw-alert" class="alert hidden"></div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-coins" style="color:var(--accent)"></i> Upload Rewards</h3>
+      <form id="rw-form">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+          <div class="form-group"><label class="form-label">📁 File Approve Reward</label><input type="number" id="rw-file" class="form-input" value="${rw.file_approve||50}" min="0"><p class="text-xs text-sub" style="margin-top:6px">File approve হলে uploader পাবে</p></div>
+          <div class="form-group"><label class="form-label">🎨 Prompt Approve Reward</label><input type="number" id="rw-prompt" class="form-input" value="${rw.prompt_approve||30}" min="0"><p class="text-xs text-sub" style="margin-top:6px">Prompt approve হলে uploader পাবে</p></div>
+          <div class="form-group"><label class="form-label">👤 Signup Bonus</label><input type="number" id="rw-signup" class="form-input" value="${rw.signup_bonus||0}" min="0"><p class="text-xs text-sub" style="margin-top:6px">নতুন user registration এ পাবে</p></div>
+        </div>
+        <h4 style="margin:20px 0 12px;font-size:1rem;border-top:1px solid var(--border-soft);padding-top:16px">⬇️ Download Rewards</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+          <div class="form-group"><label class="form-label">📤 Uploader (per download)</label><input type="number" id="rw-uploader-dl" class="form-input" value="${rw.uploader_download!==undefined?rw.uploader_download:2}" min="0"><p class="text-xs text-sub" style="margin-top:6px">তার ফাইল কেউ download করলে uploader পাবে</p></div>
+          <div class="form-group"><label class="form-label">📥 Downloader</label><input type="number" id="rw-downloader" class="form-input" value="${rw.downloader_reward!==undefined?rw.downloader_reward:1}" min="0"><p class="text-xs text-sub" style="margin-top:6px">ফাইল download করলে downloader পাবে</p></div>
+          <div class="form-group"><label class="form-label">🚫 Same User</label><select id="rw-same-user" class="form-select">
+            <option value="false" ${rw.block_same_user===false?'selected':''}>Allow (both earn)</option>
+            <option value="true" ${rw.block_same_user===true?'selected':''}>Block (skip if same)</option>
+          </select><p class="text-xs text-sub" style="margin-top:6px">নিজের ফাইল নিজে download করলে পয়েন্ট দিবে কিনা</p></div>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Rewards</button>
+      </form>
+    </div>`;
+  document.getElementById('rw-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    try{
+      await refs.settings.child('rewards').update({
+        file_approve: Number(document.getElementById('rw-file').value)||0,
+        prompt_approve: Number(document.getElementById('rw-prompt').value)||0,
+        signup_bonus: Number(document.getElementById('rw-signup').value)||0,
+        uploader_download: Number(document.getElementById('rw-uploader-dl').value)||0,
+        downloader_reward: Number(document.getElementById('rw-downloader').value)||0,
+        block_same_user: document.getElementById('rw-same-user').value === 'true',
+      });
+      showAlert('rw-alert','✅ Rewards updated','success');await loadData();
+    }catch(err){showAlert('rw-alert',err.message,'error')}
+  });
+}
+
+// ============ WITHDRAW ============
+function renderWithdraw(){
+  const wd=appSettings.withdraw||{};
+  const methods=wd.methods||{};
+  const pending=allWithdraws.filter(w=>w.status==='pending');
+  const others=allWithdraws.filter(w=>w.status!=='pending');
+  const methodsHTML=Object.entries(methods).map(([key,m])=>{
+    const rate=m.rate||100,minPts=m.min_points||500,maxPts=m.max_points||100000,charge=m.charge||0,chargeType=m.charge_type||'flat';
+    return `<div class="method-config-card">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+        <div class="flex items-center gap-3"><img src="${esc(m.image||'')}" style="width:44px;height:44px;object-fit:contain;border-radius:10px;background:white;padding:4px;border:1px solid var(--border)" onerror="this.style.display='none'"><div><div style="font-weight:700;font-size:1rem">${esc(m.name||key)}</div><div class="text-xs text-sub">${esc(m.number||'')}</div></div></div>
+        <button type="button" class="btn btn-danger btn-sm btn-icon" onclick="removeMethod('${key}')" title="Remove"><i class="fas fa-trash"></i></button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+        <div class="form-group" style="margin:0"><label class="form-label">Points Rate</label><input type="number" class="form-input" id="m-${key}-rate" value="${rate}" min="1"><p class="text-xs text-sub" style="margin-top:4px">${rate} pts = ৳1</p></div>
+        <div class="form-group" style="margin:0"><label class="form-label">Min Points</label><input type="number" class="form-input" id="m-${key}-minp" value="${minPts}" min="0"></div>
+        <div class="form-group" style="margin:0"><label class="form-label">Max Points</label><input type="number" class="form-input" id="m-${key}-maxp" value="${maxPts}" min="0"></div>
+        <div class="form-group" style="margin:0"><label class="form-label">Charge</label><div class="flex gap-2"><input type="number" class="form-input" id="m-${key}-charge" value="${charge}" min="0" style="flex:1"><select class="form-select" id="m-${key}-ctype" style="max-width:80px"><option value="flat" ${chargeType==='flat'?'selected':''}>৳</option><option value="percent" ${chargeType==='percent'?'selected':''}>%</option></select></div><p class="text-xs text-sub" style="margin-top:4px">${chargeType==='flat'?charge+'৳ per withdraw':charge+'% of amount'}</p></div>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm mt-4" onclick="saveMethodSettings('${key}')"><i class="fas fa-save"></i> Save ${esc(m.name||key)}</button>
+    </div>`;
+  }).join('')||'<p class="text-sub text-sm" style="padding:16px;text-align:center;background:var(--bg-2);border-radius:12px">No methods yet. Add one below.</p>';
+  const renderRow=(w,actions)=>`<tr>
+    <td class="truncate" style="max-width:180px">${esc(w.userEmail||w.userId||'')}</td>
+    <td><span class="badge badge-points">${w.amount} pts</span></td>
+    <td><span style="font-weight:700;color:var(--success)">৳${w.takaAmount||0}</span></td>
+    <td>${esc(w.method||'')}</td>
+    <td class="truncate" style="max-width:150px">${esc(w.account||'')}</td>
+    <td class="text-sm text-sub">${fmtDate(w.createdAt)}</td>
+    <td><span class="badge badge-${w.status==='approved'?'approved':w.status==='rejected'?'rejected':'pending'}">${w.status}</span></td>
+    ${actions?`<td><div class="flex gap-1"><button class="btn btn-success btn-sm btn-icon" onclick="approveWd('${w.id}')" title="Approve"><i class="fas fa-check"></i></button><button class="btn btn-danger btn-sm btn-icon" onclick="rejectWd('${w.id}')" title="Reject & Refund"><i class="fas fa-times"></i></button></div></td>`:''}
+  </tr>`;
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Withdraw','wallet')}
+    <div id="wd-alert" class="alert hidden"></div>
+    <div class="alert-banner info"><div class="alert-banner-icon"><i class="fas fa-lightbulb"></i></div><div class="alert-banner-content"><div class="alert-banner-title">Per-Method Settings</div><div class="alert-banner-sub">প্রতিটি method এর নিজস্ব rate, limit এবং charge সেট করুন</div></div></div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-credit-card" style="color:var(--primary)"></i> Withdraw Methods</h3>
+      <div id="methods-list">${methodsHTML}</div>
+      <div style="background:var(--bg-2);padding:16px;border-radius:14px;margin-top:16px;border:2px dashed var(--primary)">
+        <h5 style="margin:0 0 12px;font-size:.95rem"><i class="fas fa-plus-circle" style="color:var(--primary)"></i> Add New Method</h5>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+          <input type="text" id="nm-key" class="form-input" placeholder="Key (bkash)">
+          <input type="text" id="nm-name" class="form-input" placeholder="Name (bKash)">
+          <input type="url" id="nm-image" class="form-input" placeholder="Logo URL">
+          <input type="text" id="nm-number" class="form-input" placeholder="Admin number">
+          <input type="number" id="nm-rate" class="form-input" placeholder="Points rate" value="100" min="1">
+          <input type="number" id="nm-minp" class="form-input" placeholder="Min points" value="500" min="0">
+          <input type="number" id="nm-maxp" class="form-input" placeholder="Max points" value="100000" min="0">
+          <div class="flex gap-2"><input type="number" id="nm-charge" class="form-input" placeholder="Charge" value="0" min="0" style="flex:1"><select id="nm-ctype" class="form-select" style="max-width:80px"><option value="flat">৳</option><option value="percent">%</option></select></div>
+        </div>
+        <button type="button" class="btn btn-primary mt-4" onclick="addMethod()"><i class="fas fa-plus"></i> Add Method</button>
+      </div>
+    </div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-clock" style="color:var(--accent)"></i> Pending Requests (${pending.length})</h3>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>User</th><th>Points</th><th>Taka</th><th>Method</th><th>Account</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>${pending.length?pending.map(w=>renderRow(w,true)).join(''):'<tr><td colspan="8" class="text-center text-sub" style="padding:40px">No pending requests</td></tr>'}</tbody></table></div>
+    </div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-history" style="color:var(--text-sub)"></i> History (${others.length})</h3>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>User</th><th>Points</th><th>Taka</th><th>Method</th><th>Account</th><th>Date</th><th>Status</th></tr></thead><tbody>${others.length?others.map(w=>renderRow(w,false)).join(''):'<tr><td colspan="7" class="text-center text-sub" style="padding:40px">No history</td></tr>'}</tbody></table></div>
+    </div>`;
+}
+
+async function addMethod(){
+  const key=document.getElementById('nm-key').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  const name=document.getElementById('nm-name').value.trim();
+  if(!key||!name){alert('Key & Name required');return}
+  try{
+    await refs.settings.child('withdraw').child('methods').child(key).set({
+      name,image:document.getElementById('nm-image').value.trim(),number:document.getElementById('nm-number').value.trim(),
+      rate:Number(document.getElementById('nm-rate').value)||100,min_points:Number(document.getElementById('nm-minp').value)||500,
+      max_points:Number(document.getElementById('nm-maxp').value)||100000,charge:Number(document.getElementById('nm-charge').value)||0,
+      charge_type:document.getElementById('nm-ctype').value||'flat'
+    });
+    await loadData();
+  }catch(err){alert(err.message)}
+}
+
+async function saveMethodSettings(key){
+  try{
+    await refs.settings.child('withdraw').child('methods').child(key).update({
+      rate:Number(document.getElementById(`m-${key}-rate`).value)||100,
+      min_points:Number(document.getElementById(`m-${key}-minp`).value)||0,
+      max_points:Number(document.getElementById(`m-${key}-maxp`).value)||100000,
+      charge:Number(document.getElementById(`m-${key}-charge`).value)||0,
+      charge_type:document.getElementById(`m-${key}-ctype`).value||'flat'
+    });
+    showAlert('wd-alert',`✅ ${key} settings saved`,'success');await loadData();
+  }catch(err){showAlert('wd-alert',err.message,'error')}
+}
+
+async function removeMethod(key){
+  openConfirmModal(`Remove method <strong>"${key}"</strong>?`,async ()=>{
+    await refs.settings.child('withdraw').child('methods').child(key).remove();await loadData();
+  });
+}
+
+async function approveWd(id){
+  const w=allWithdraws.find(x=>x.id===id);if(!w)return;
+  openConfirmModal(`Approve <strong>${w.amount} pts → ৳${w.takaAmount||0}</strong> for <strong>${esc(w.userEmail||w.userId)}</strong>?<br><span class="text-sm text-sub">Balance already deducted at request time.</span>`,async ()=>{
+    await refs.withdraws.child(id).update({status:'approved',approvedAt:Date.now(),approvedBy:currentUser.uid});
+    if(w.userId){await refs.notifications.push({title:'✅ Withdraw Approved',decs:`Your withdrawal of **${w.amount} points (৳${w.takaAmount||0})** has been approved!\n\n💳 Method: ${w.method}\n📱 Account: ${w.account}\n\nআপনার একাউন্টে টাকা পাঠানো হয়েছে।`,created_at:Date.now(),is_read:false,target_uid:w.userId})}
+    await loadData();
+  });
+}
+
+async function rejectWd(id){
+  const w=allWithdraws.find(x=>x.id===id);if(!w)return;
+  openConfirmModal(`Reject <strong>${w.amount} pts</strong> withdraw?<br><span class="text-sm" style="color:var(--success);font-weight:600">💰 ${w.amount} points will be refunded</span>`,async ()=>{
+    await refs.withdraws.child(id).update({status:'rejected',rejectedAt:Date.now(),rejectedBy:currentUser.uid});
+    if(w.userId){
+      await refs.users.child(w.userId).child('balance').transaction(b=>(b||0)+w.amount);
+      await refs.transactions.push({userId:w.userId,type:'withdraw_refund',amount:w.amount,createdAt:Date.now()});
+      await refs.notifications.push({title:'❌ Withdraw Rejected',decs:`Your withdrawal of **${w.amount} points** was rejected.\n\n💰 Amount **fully refunded** to your balance.`,created_at:Date.now(),is_read:false,target_uid:w.userId});
+    }
+    await loadData();
+  });
+}
+
+// ============ USER PROMPTS ============
+function renderUserPrompts(){
+  const rw=appSettings.rewards||{};const rewardAmt=Number(rw.prompt_approve)||30;
+  const pendingCount=allPrompts.filter(p=>p.status==='pending').length;
+  const rows=allPrompts.map(p=>`<tr>
+    <td>${p.sample_image?`<img src="${esc(p.sample_image)}" class="thumb-sm" onerror="this.style.display='none'">`:'<div style="width:56px;height:56px;background:var(--bg-2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text-mute)"><i class="fas fa-image"></i></div>'}</td>
+    <td class="font-bold truncate" style="max-width:200px">${esc(p.title||'Untitled')}</td>
+    <td class="truncate" style="max-width:220px;font-family:monospace;font-size:.78rem">${esc((p.prompt||'').substring(0,70))}...</td>
+    <td class="text-sm">${esc(p.uploadedByEmail?p.uploadedByEmail.split('@')[0]:'User')}</td>
+    <td><span class="badge badge-${p.status||'pending'}">${p.status||'pending'}</span></td>
+    <td><span class="badge badge-points">${p.required_ads||0} ads</span></td>
+    <td><div class="flex gap-1 flex-wrap">
+      ${p.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approvePrompt('${p.id}')"><i class="fas fa-check"></i> Approve</button>`:''}
+      ${p.status==='pending'?`<button class="btn btn-danger btn-sm btn-icon" onclick="rejectPrompt('${p.id}')" title="Reject"><i class="fas fa-times"></i></button>`:''}
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="viewPrompt('${p.id}')" title="View"><i class="fas fa-eye"></i></button>
+      <button class="btn btn-warning btn-sm btn-icon" onclick="editPromptAdmin('${p.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="deletePrompt('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('')||'<tr><td colspan="7" class="text-center text-sub" style="padding:40px">No prompts yet</td></tr>';
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('User AI Prompts','wand-magic-sparkles')}
+    ${pendingCount>0?`<div class="alert-banner warn"><div class="alert-banner-icon"><i class="fas fa-clock"></i></div><div class="alert-banner-content"><div class="alert-banner-title">${pendingCount} pending approval</div><div class="alert-banner-sub">Approve করলে +${rewardAmt} pts auto credit</div></div></div>`:`<div class="alert-banner info"><div class="alert-banner-icon"><i class="fas fa-info-circle"></i></div><div class="alert-banner-content"><div class="alert-banner-title">Approve + Reward</div><div class="alert-banner-sub">Approve করলে user পাবে +${rewardAmt} points</div></div></div>`}
+    <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Preview</th><th>Title</th><th>Prompt</th><th>Uploader</th><th>Status</th><th>Ads</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+
+async function approvePrompt(id){
+  const p=allPrompts.find(x=>x.id===id);if(!p)return;
+  const rw=appSettings.rewards||{};const rewardAmt=Number(rw.prompt_approve)||30;
+  document.getElementById('modal-title').innerHTML='<i class="fas fa-check-circle" style="color:var(--success)"></i> Approve Prompt';
+  document.getElementById('modal-form').innerHTML=`
+    ${rewardAmt>0?`<div class="alert alert-info"><i class="fas fa-coins"></i> Reward: <strong>+${rewardAmt} points</strong> to uploader</div>`:''}
+    <div class="form-group"><label class="form-label">Title</label><input type="text" id="ap-title" class="form-input" value="${esc(p.title||'')}" required></div>
+    <div class="form-group"><label class="form-label">Prompt Text</label><textarea id="ap-text" class="form-textarea" rows="4" required style="font-family:monospace;font-size:.85rem">${esc(p.prompt||'')}</textarea></div>
+    <div class="form-group"><label class="form-label">Sample Image URL</label><input type="url" id="ap-sample" class="form-input" value="${esc(p.sample_image||'')}"></div>
+    <div class="form-group"><label class="form-label">Detail Images (one per line)</label><textarea id="ap-details" class="form-textarea" rows="3" style="font-family:monospace;font-size:.82rem">${esc((p.detail_photos||[]).join('\n'))}</textarea></div>
+    <div class="form-group"><label class="form-label">Required Ads Steps</label><input type="number" id="ap-ads" class="form-input" value="${p.required_ads||0}" min="0"></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-success" id="ap-btn"><i class="fas fa-check"></i> Approve ${rewardAmt>0?`& +${rewardAmt} pts`:''}</button></div>`;
+  document.getElementById('modal-form').onsubmit=async (e)=>{
+    e.preventDefault();
+    const btn=document.getElementById('ap-btn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Approving...';
+    const steps=parseInt(document.getElementById('ap-ads').value)||0;
+    try{
+      await refs.prompts.child(id).update({title:document.getElementById('ap-title').value,prompt:document.getElementById('ap-text').value,sample_image:document.getElementById('ap-sample').value,detail_photos:document.getElementById('ap-details').value.split('\n').map(u=>u.trim()).filter(u=>u),required_ads:steps,status:'approved',approved_at:Date.now()});
+      if(p.uploadedBy&&rewardAmt>0&&p.status!=='approved'){
+        await refs.users.child(p.uploadedBy).child('balance').transaction(b=>(b||0)+rewardAmt);
+        await refs.users.child(p.uploadedBy).child('totalEarnings').transaction(b=>(b||0)+rewardAmt);
+        await refs.transactions.push({userId:p.uploadedBy,type:'prompt_approve',amount:rewardAmt,itemId:id,itemTitle:p.title,createdAt:Date.now()});
+      }
+      if(p.uploadedBy){await refs.notifications.push({title:`✅ Prompt Approved${rewardAmt>0?` +${rewardAmt} pts`:''}`,decs:`Your prompt **"${p.title}"** has been approved!\n\n${rewardAmt>0?`💰 Reward: **+${rewardAmt} points** credited.`:''}\n\n🔓 Ads required: ${steps}`,created_at:Date.now(),is_read:false,target_uid:p.uploadedBy})}
+      closeModal();await loadData();
+    }catch(err){showAlert('modal-alert',err.message,'error');btn.disabled=false;btn.innerHTML='<i class="fas fa-check"></i> Approve'}
+  };
+  openModal();
+}
+
+async function rejectPrompt(id){
+  const p=allPrompts.find(x=>x.id===id);if(!p)return;
+  openConfirmModal(`Reject prompt <strong>"${esc(p.title)}"</strong>?`,async ()=>{
+    await refs.prompts.child(id).update({status:'rejected',rejected_at:Date.now()});
+    if(p.uploadedBy){await refs.notifications.push({title:'❌ Prompt Rejected',decs:`Your prompt **"${p.title}"** was rejected.`,created_at:Date.now(),is_read:false,target_uid:p.uploadedBy})}
+    await loadData();
+  });
+}
+
+function viewPrompt(id){
+  const p=allPrompts.find(x=>x.id===id);if(!p)return;
+  document.getElementById('modal-title').innerHTML='<i class="fas fa-eye" style="color:var(--primary)"></i> View Prompt';
+  document.getElementById('modal-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Title</label><input class="form-input" value="${esc(p.title||'')}" disabled></div>
+    <div class="form-group"><label class="form-label">Prompt</label><textarea class="form-textarea" rows="5" disabled style="font-family:monospace;font-size:.85rem">${esc(p.prompt||'')}</textarea></div>
+    ${p.sample_image?`<div class="form-group"><label class="form-label">Sample</label><img src="${esc(p.sample_image)}" style="max-width:100%;max-height:200px;border-radius:10px;border:2px solid var(--border)"></div>`:''}
+    <div class="form-group"><label class="form-label">Uploaded By</label><input class="form-input" value="${esc(p.uploadedByEmail||'Unknown')}" disabled></div>
+    <div class="flex justify-end mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Close</button></div>`;
+  document.getElementById('modal-form').onsubmit=(e)=>e.preventDefault();
+  openModal();
+}
+
+function editPromptAdmin(id){
+  const p=allPrompts.find(x=>x.id===id);if(!p)return;
+  document.getElementById('modal-title').innerHTML='<i class="fas fa-edit" style="color:var(--accent)"></i> Edit Prompt';
+  document.getElementById('modal-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Title</label><input type="text" id="ep-title" class="form-input" value="${esc(p.title||'')}" required></div>
+    <div class="form-group"><label class="form-label">Prompt Text</label><textarea id="ep-text" class="form-textarea" rows="4" required style="font-family:monospace">${esc(p.prompt||'')}</textarea></div>
+    <div class="form-group"><label class="form-label">Sample Image</label><input type="url" id="ep-sample" class="form-input" value="${esc(p.sample_image||'')}"></div>
+    <div class="form-group"><label class="form-label">Ads Steps</label><input type="number" id="ep-ads" class="form-input" value="${p.required_ads||0}" min="0"></div>
+    <div class="form-group"><label class="form-label">Status</label><select id="ep-status" class="form-select">
+      <option value="approved" ${p.status==='approved'?'selected':''}>✅ Approved</option>
+      <option value="pending" ${p.status==='pending'?'selected':''}>⏳ Pending</option>
+      <option value="rejected" ${p.status==='rejected'?'selected':''}>❌ Rejected</option>
+    </select></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button></div>`;
+  document.getElementById('modal-form').onsubmit=async (e)=>{
+    e.preventDefault();
+    try{await refs.prompts.child(id).update({title:document.getElementById('ep-title').value,prompt:document.getElementById('ep-text').value,sample_image:document.getElementById('ep-sample').value,required_ads:parseInt(document.getElementById('ep-ads').value)||0,status:document.getElementById('ep-status').value});closeModal();await loadData()}
+    catch(err){showAlert('modal-alert',err.message,'error')}
+  };
+  openModal();
+}
+
+function deletePrompt(id){const p=allPrompts.find(x=>x.id===id);openConfirmModal(`Delete <strong>"${esc(p?p.title:id)}"</strong>?`,async ()=>{await refs.prompts.child(id).remove();await loadData()})}
+
+// ============ BANNERS ============
+function renderBanners(){
+  const rows=allBanners.map(b=>`<tr>
+    <td><img src="${esc(b.thumbnail_url)}" style="width:80px;height:45px;object-fit:cover;border-radius:8px" onerror="this.style.background='var(--bg-2)'"></td>
+    <td class="font-bold">${esc(b.title||'Untitled')}</td>
+    <td class="truncate" style="max-width:200px">${b.download_url?`<a href="${esc(b.download_url)}" target="_blank" style="color:var(--primary);text-decoration:none;font-size:.82rem">${esc(b.download_url.substring(0,40))}...</a>`:'<span class="text-sub text-sm">No link</span>'}</td>
+    <td><div class="flex gap-1"><button class="btn btn-warning btn-sm btn-icon" onclick="openBannerForm('${b.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm btn-icon" onclick="deleteBanner('${b.id}')"><i class="fas fa-trash"></i></button></div></td>
+  </tr>`).join('')||'<tr><td colspan="4" class="text-center text-sub" style="padding:40px">No banners yet</td></tr>';
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Sliders','image',`<button class="btn btn-primary" onclick="openBannerForm()"><i class="fas fa-plus"></i> Add Slider</button>`)}
+    <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Thumbnail</th><th>Title</th><th>Link</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+
+function openBannerForm(bannerId){
+  const b=bannerId?allBanners.find(x=>x.id===bannerId):{};
+  if(bannerId&&!b)return;
+  document.getElementById('modal-title').innerHTML=bannerId?'<i class="fas fa-edit"></i> Edit Slider':'<i class="fas fa-plus-circle"></i> Add Slider';
+  document.getElementById('modal-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Title *</label><input type="text" id="bn-title" class="form-input" value="${esc(b.title||'')}" required></div>
+    <div class="form-group"><label class="form-label">Image URL *</label><input type="url" id="bn-image" class="form-input" value="${esc(b.thumbnail_url||'')}" required></div>
+    <div class="form-group"><label class="form-label">Target Link (Optional)</label><input type="url" id="bn-link" class="form-input" value="${esc(b.download_url||'')}"></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button></div>`;
+  document.getElementById('modal-form').onsubmit=async (e)=>{
+    e.preventDefault();
+    const data={title:document.getElementById('bn-title').value,thumbnail_url:document.getElementById('bn-image').value,download_url:document.getElementById('bn-link').value,created_at:b.created_at||Date.now()};
+    try{if(bannerId)await refs.banners.child(bannerId).update(data);else await refs.banners.push(data);closeModal();await loadData()}
+    catch(err){showAlert('modal-alert',err.message,'error')}
+  };
+  openModal();
+}
+function deleteBanner(id){openConfirmModal('Delete this banner?',async ()=>{await refs.banners.child(id).remove();await loadData()})}
+
+// ============ AI PROMPTS ============
+function renderAIPrompts(){
+  const img=appSettings.aiImage||{};
+  const prompts=img.prompts||[];
+  const rows=prompts.map((p,i)=>`<tr>
+    <td>${p.sample_image?`<img src="${esc(p.sample_image)}" class="thumb-sm" onerror="this.style.display='none'">`:'—'}</td>
+    <td class="font-bold">${esc(p.title||'Untitled')}</td>
+    <td class="truncate" style="max-width:240px;font-family:monospace;font-size:.78rem">${esc((p.prompt||'').substring(0,60))}...</td>
+    <td><span class="badge badge-points">${p.required_ads||0}</span></td>
+    <td><div class="flex gap-1"><button class="btn btn-warning btn-sm btn-icon" onclick="editAdminPrompt(${i})"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm btn-icon" onclick="deleteAdminPrompt(${i})"><i class="fas fa-trash"></i></button></div></td>
+  </tr>`).join('')||'<tr><td colspan="5" class="text-center text-sub" style="padding:40px">No prompts yet</td></tr>';
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Admin AI Prompts','magic',`<button class="btn btn-primary" onclick="openAdminPromptForm()"><i class="fas fa-plus"></i> Add Prompt</button>`)}
+    <div id="ap-alert" class="alert hidden"></div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-cog" style="color:var(--primary)"></i> Settings</h3>
+      <form id="ap-settings-form">
+        <div class="checkbox-row"><input type="checkbox" id="ap-enabled" ${img.enabled!==false?'checked':''}><label for="ap-enabled">Enable AI Prompts Section</label></div>
+        <div class="form-group"><label class="form-label">Gemini AI URL</label><input type="url" id="ap-gemini" class="form-input" value="${esc(img.geminiUrl||'https://gemini.google.com/app')}"></div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-list"></i> Prompt Library (${prompts.length})</h3>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Img</th><th>Title</th><th>Prompt</th><th>Ads</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>`;
+  document.getElementById('ap-settings-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    try{await refs.settings.child('aiImage').update({enabled:document.getElementById('ap-enabled').checked,geminiUrl:document.getElementById('ap-gemini').value.trim()||'https://gemini.google.com/app',prompts:img.prompts||[]});showAlert('ap-alert','✅ Saved','success');await loadData()}
+    catch(err){showAlert('ap-alert',err.message,'error')}
+  });
+}
+
+function openAdminPromptForm(index){
+  const img=appSettings.aiImage||{};
+  const prompts=img.prompts||[];
+  const isEdit=(index!==null&&index!==undefined);
+  const p=isEdit?prompts[index]:{};
+  document.getElementById('modal-title').innerHTML=isEdit?'<i class="fas fa-edit"></i> Edit Prompt':'<i class="fas fa-plus-circle"></i> Add Prompt';
+  document.getElementById('modal-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Title *</label><input type="text" id="pi-title" class="form-input" value="${esc(p.title||'')}" required></div>
+    <div class="form-group"><label class="form-label">Prompt Text *</label><textarea id="pi-text" class="form-textarea" rows="5" required style="font-family:monospace">${esc(p.prompt||'')}</textarea></div>
+    <div class="form-group"><label class="form-label">Ads Steps</label><input type="number" id="pi-ads" class="form-input" value="${p.required_ads||0}" min="0"></div>
+    <div class="form-group"><label class="form-label">Sample Image URL</label><input type="url" id="pi-sample" class="form-input" value="${esc(p.sample_image||'')}"></div>
+    <div class="form-group"><label class="form-label">Detail Images (one per line)</label><textarea id="pi-details" class="form-textarea" rows="3" style="font-family:monospace">${esc((p.detail_photos||[]).join('\n'))}</textarea></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button></div>`;
+  document.getElementById('modal-form').onsubmit=async (e)=>{
+    e.preventDefault();
+    const data={title:document.getElementById('pi-title').value,prompt:document.getElementById('pi-text').value,required_ads:parseInt(document.getElementById('pi-ads').value)||0,sample_image:document.getElementById('pi-sample').value,detail_photos:document.getElementById('pi-details').value.split('\n').map(u=>u.trim()).filter(u=>u),created_at:isEdit?(p.created_at||Date.now()):Date.now()};
+    let list=[...prompts];
+    if(isEdit)list[index]=data;else list.push(data);
+    try{await refs.settings.child('aiImage').child('prompts').set(list);closeModal();await loadData()}
+    catch(err){showAlert('modal-alert',err.message,'error')}
+  };
+  openModal();
+}
+function deleteAdminPrompt(index){openConfirmModal('Delete this prompt?',async ()=>{const list=[...(appSettings.aiImage?.prompts||[])];list.splice(index,1);await refs.settings.child('aiImage').child('prompts').set(list);await loadData()})}
+
+// ============ USERS ============
+function renderUsers(){
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Users','users')}
+    <div class="card"><div class="mb-4"><input type="text" id="user-search" class="form-input" placeholder="🔍 Search by email, username, ID..."></div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Balance</th><th>Status</th><th>Actions</th></tr></thead><tbody id="users-tbody">${usersTableHTML(allUsers)}</tbody></table></div></div>`;
+  document.getElementById('user-search').addEventListener('input',function(e){
+    const s=e.target.value.toLowerCase();
+    const f=allUsers.filter(u=>(u.email||'').toLowerCase().includes(s)||(u.username||'').toLowerCase().includes(s)||(u.numericId||'').includes(s)||(u.fullname||'').toLowerCase().includes(s));
+    document.getElementById('users-tbody').innerHTML=usersTableHTML(f);
+  });
+}
+function usersTableHTML(users){
+  if(!users.length)return '<tr><td colspan="6" class="text-center text-sub" style="padding:40px">No users</td></tr>';
+  return users.map(u=>`<tr>
+    <td class="font-mono text-sm">${u.numericId||u.id.substring(0,10)}</td>
+    <td class="font-bold">${esc(u.username||'N/A')}</td>
+    <td class="text-sm">${esc(u.email||'N/A')}</td>
+    <td><span class="badge badge-points">${u.balance||0} pts</span></td>
+    <td><span class="badge badge-${u.isAccountActive!==false?'active':'banned'}">${u.isAccountActive!==false?'Active':'Banned'}</span></td>
+    <td><div class="flex gap-1">
+      <button class="btn ${u.isAccountActive!==false?'btn-danger':'btn-success'} btn-sm btn-icon" onclick="toggleBan('${u.id}',${u.isAccountActive!==false})" title="${u.isAccountActive!==false?'Ban':'Unban'}"><i class="fas ${u.isAccountActive!==false?'fa-ban':'fa-check'}"></i></button>
+      <button class="btn btn-warning btn-sm btn-icon" onclick="adjustBalance('${u.id}')" title="Adjust Balance"><i class="fas fa-coins"></i></button>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="editUser('${u.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+async function toggleBan(id,current){openConfirmModal(current?'Ban this user?':'Unban this user?',async ()=>{await refs.users.child(id).update({isAccountActive:!current});await loadData()})}
+
+function adjustBalance(userId){
+  const u=allUsers.find(x=>x.id===userId);if(!u)return;
+  document.getElementById('modal-title').innerHTML='<i class="fas fa-coins" style="color:var(--accent)"></i> Adjust Balance';
+  document.getElementById('modal-form').innerHTML=`
+    <div style="background:var(--bg-2);padding:14px;border-radius:12px;margin-bottom:16px">
+      <div class="text-sm text-sub">User</div><div class="font-bold">${esc(u.username||u.email||u.id)}</div>
+      <div class="text-sm text-sub" style="margin-top:8px">Current Balance</div><div class="font-bold" style="font-size:1.4rem;color:var(--primary)">${u.balance||0} pts</div>
+    </div>
+    <div class="form-group"><label class="form-label">Amount (positive to add, negative to subtract)</label><input type="number" id="bal-amt" class="form-input" placeholder="e.g. 50 or -20"></div>
+    <div class="form-group"><label class="form-label">Reason (optional)</label><input type="text" id="bal-reason" class="form-input" placeholder="e.g. Bonus, correction..."></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Apply</button></div>`;
+  document.getElementById('modal-form').onsubmit=async (e)=>{
+    e.preventDefault();
+    const amt=Number(document.getElementById('bal-amt').value);if(!amt)return;
+    const reason=document.getElementById('bal-reason').value.trim();
+    await refs.users.child(userId).child('balance').transaction(b=>(b||0)+amt);
+    await refs.transactions.push({userId,type:amt>0?'admin_credit':'admin_debit',amount:amt,reason,createdAt:Date.now(),by:currentUser.uid});
+    await refs.notifications.push({title:amt>0?`+${amt} points added`:`${amt} points deducted`,decs:`Admin adjusted your balance by **${amt>0?'+':''}${amt} points**${reason?`\n\nReason: ${reason}`:''}`,created_at:Date.now(),is_read:false,target_uid:userId});
+    closeModal();await loadData();
+  };
+  openModal();
+}
+
+function editUser(userId){
+  const u=allUsers.find(x=>x.id===userId);if(!u)return;
+  document.getElementById('modal-title').innerHTML='<i class="fas fa-user-edit"></i> Edit User';
+  document.getElementById('modal-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Username</label><input type="text" id="eu-username" class="form-input" value="${esc(u.username||'')}"></div>
+    <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="eu-fullname" class="form-input" value="${esc(u.fullname||'')}"></div>
+    <div class="flex justify-end gap-3 mt-4"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button></div>`;
+  document.getElementById('modal-form').onsubmit=async (e)=>{e.preventDefault();await refs.users.child(userId).update({username:document.getElementById('eu-username').value,fullname:document.getElementById('eu-fullname').value});closeModal();await loadData()};
+  openModal();
+}
+
+// ============ ADMIN INFO ============
+function renderAdminInfo(){
+  const a=appSettings.admin||{};const s=a.social||{};
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Admin Info','user-shield')}
+    <div id="ai-alert" class="alert hidden"></div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-user" style="color:var(--primary)"></i> Basic Info</h3>
+      <form id="ai-form">
+        <div class="form-group"><label class="form-label">Display Name</label><input type="text" id="ai-name" class="form-input" value="${esc(a.name||'FILE HUB এডমিন')}"></div>
+        <div class="form-group"><label class="form-label">Bio</label><textarea id="ai-bio" class="form-textarea" rows="3">${esc(a.bio||'')}</textarea></div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-share-alt" style="color:var(--primary)"></i> Social Media</h3>
+      <form id="as-form">
+        <div class="form-group"><label class="form-label">📱 Telegram</label><input type="url" id="s-tg" class="form-input" value="${esc(s.telegram||'')}" placeholder="https://t.me/username"></div>
+        <div class="form-group"><label class="form-label">📘 Facebook</label><input type="url" id="s-fb" class="form-input" value="${esc(s.facebook||'')}"></div>
+        <div class="form-group"><label class="form-label">📺 YouTube</label><input type="url" id="s-yt" class="form-input" value="${esc(s.youtube||'')}"></div>
+        <div class="form-group"><label class="form-label">💬 WhatsApp</label><input type="url" id="s-wa" class="form-input" value="${esc(s.whatsapp||'')}"></div>
+        <div class="form-group"><label class="form-label">📸 Instagram</label><input type="url" id="s-ig" class="form-input" value="${esc(s.instagram||'')}"></div>
+        <div class="form-group"><label class="form-label">🐦 Twitter</label><input type="url" id="s-tw" class="form-input" value="${esc(s.twitter||'')}"></div>
+        <div class="form-group"><label class="form-label">📧 Email</label><input type="email" id="s-em" class="form-input" value="${esc(s.email||'')}"></div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>`;
+  document.getElementById('ai-form').addEventListener('submit',async (e)=>{e.preventDefault();await refs.settings.child('admin').update({name:document.getElementById('ai-name').value,bio:document.getElementById('ai-bio').value});showAlert('ai-alert','✅ Saved','success');await loadData()});
+  document.getElementById('as-form').addEventListener('submit',async (e)=>{e.preventDefault();await refs.settings.child('admin').child('social').update({telegram:document.getElementById('s-tg').value,facebook:document.getElementById('s-fb').value,youtube:document.getElementById('s-yt').value,whatsapp:document.getElementById('s-wa').value,instagram:document.getElementById('s-ig').value,twitter:document.getElementById('s-tw').value,email:document.getElementById('s-em').value});showAlert('ai-alert','✅ Saved','success');await loadData()});
+}
+
+// ============ NOTIFICATIONS ============
+function renderNotifications(){
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Notifications','bell')}
+    <div id="n-alert" class="alert hidden"></div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-paper-plane" style="color:var(--primary)"></i> Send Notification</h3>
+      <form id="n-form">
+        <div class="form-group"><label class="form-label">Target UID (leave empty for ALL)</label><input type="text" id="n-target" class="form-input" placeholder="User UID or blank"></div>
+        <div class="form-group"><label class="form-label">Title</label><input type="text" id="n-title" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">Message (Markdown supported)</label><textarea id="n-msg" class="form-textarea" rows="4" required></textarea></div>
+        <button type="submit" class="btn btn-primary" id="n-btn"><i class="fas fa-paper-plane"></i> Send</button>
+      </form>
+    </div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-history"></i> Recent</h3>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Title</th><th>Target</th><th>Date</th><th></th></tr></thead><tbody id="n-list"><tr><td colspan="4" class="text-center text-sub" style="padding:30px">Loading...</td></tr></tbody></table></div>
+    </div>`;
+  loadRecentNotifs();
+  document.getElementById('n-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    const btn=document.getElementById('n-btn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Sending...';
+    try{await refs.notifications.push({title:document.getElementById('n-title').value,decs:document.getElementById('n-msg').value,created_at:Date.now(),is_read:false,target_uid:document.getElementById('n-target').value.trim()||'all'});showAlert('n-alert','✅ Sent','success');document.getElementById('n-form').reset();loadRecentNotifs()}
+    catch(err){showAlert('n-alert',err.message,'error')}
+    btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Send';
+  });
+}
+async function loadRecentNotifs(){
+  try{
+    const snap=await refs.notifications.orderByChild('created_at').limitToLast(20).once('value');
+    const items=snap.val()?Object.entries(snap.val()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.created_at||0)-(a.created_at||0)):[];
+    const list=document.getElementById('n-list');if(!list)return;
+    list.innerHTML=items.length?items.map(n=>`<tr>
+      <td class="font-bold truncate" style="max-width:240px">${esc(n.title||'')}</td>
+      <td class="text-sm">${n.target_uid==='all'||!n.target_uid?'<span class="badge badge-active">All</span>':`<span class="font-mono text-xs">${n.target_uid.substring(0,8)}...</span>`}</td>
+      <td class="text-sm text-sub">${fmtDate(n.created_at)}</td>
+      <td><button class="btn btn-danger btn-sm btn-icon" onclick="deleteNotif('${n.id}')"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join(''):'<tr><td colspan="4" class="text-center text-sub" style="padding:30px">None</td></tr>';
+  }catch(e){console.error(e)}
+}
+function deleteNotif(id){openConfirmModal('Delete this notification?',async ()=>{await refs.notifications.child(id).remove();loadRecentNotifs()})}
+
+// ============ SETTINGS ============
+function renderSettings(){
+  const app=appSettings.app||{};
+  const ads=appSettings.ads||{};
+  const wd=appSettings.withdraw||{};
+  const maint=appSettings.maintenance||{};
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('Settings','cog')}
+    <div id="s-alert" class="alert hidden"></div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fas fa-mobile-alt" style="color:var(--primary)"></i> App Settings</h3>
+      <form id="app-form">
+        <div class="form-group"><label class="form-label">App Name</label><input type="text" id="s-app-name" class="form-input" value="${esc(app.appName||'FileHub')}"></div>
+        <div class="form-group"><label class="form-label">Scrolling Notice (home page)</label><input type="text" id="s-app-notice" class="form-input" value="${esc(app.scrollingNotice||'')}" placeholder="Welcome to FileHub!"></div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fas fa-tools" style="color:var(--accent)"></i> Site Maintenance Mode</h3>
+      <form id="maint-form">
+        <div class="checkbox-row">
+          <input type="checkbox" id="s-maint-enabled" ${maint.enabled?'checked':''}>
+          <label for="s-maint-enabled">Enable Maintenance Mode</label>
+        </div>
+        <div class="form-group"><label class="form-label">Maintenance Message</label>
+          <textarea id="s-maint-message" class="form-textarea" rows="3" placeholder="আমরা রক্ষণাবেক্ষণের জন্য কাজ করছি...">${esc(maint.message||'🚧 সাইট মেইনটেইন করা হচ্ছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।')}</textarea></div>
+        <div class="alert alert-warn"><i class="fas fa-info-circle"></i> Enable করলে সাধারণ ইউজাররা সাইটে ঢুকতে পারবে না। শুধু admin দেখতে পাবে।</div>
+        <button type="submit" class="btn btn-primary" style="margin-top:12px"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fas fa-wallet" style="color:var(--primary)"></i> Withdraw System</h3>
+      <form id="wd-toggle-form">
+        <div class="checkbox-row">
+          <input type="checkbox" id="s-wd-enabled" ${wd.enabled!==false?'checked':''}>
+          <label for="s-wd-enabled">Enable Withdraw System</label>
+        </div>
+        <div class="alert alert-warn"><i class="fas fa-info-circle"></i> বন্ধ করলে ইউজাররা withdraw request দিতে পারবে না। Pending request admin approve/reject করতে পারবে।</div>
+        <button type="submit" class="btn btn-primary" style="margin-top:12px"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fas fa-ad" style="color:var(--accent)"></i> Ad Network</h3>
+      <form id="ad-form">
+        <div class="form-group"><label class="form-label">Adsterra Direct Link</label><input type="url" id="s-ad-link" class="form-input" value="${esc(ads.adsterraDirectLink||'')}" placeholder="https://www.effectivegatecpm.com/xxx"></div>
+        <div class="form-group"><label class="form-label">Ads Timer (Seconds per step)</label><input type="number" id="s-ad-timer" class="form-input" value="${ads.step_timer_seconds||8}" min="3" max="60"><p class="text-xs text-sub" style="margin-top:6px">টাইমার শেষ হলে auto unlock + ফিরে আসবে</p></div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>`;
+
+  document.getElementById('app-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    await refs.settings.child('app').update({appName:document.getElementById('s-app-name').value,scrollingNotice:document.getElementById('s-app-notice').value});
+    showAlert('s-alert','✅ Saved','success');await loadData();
+  });
+
+  document.getElementById('maint-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    await refs.settings.child('maintenance').update({
+      enabled: document.getElementById('s-maint-enabled').checked,
+      message: document.getElementById('s-maint-message').value,
+    });
+    showAlert('s-alert','✅ Maintenance settings saved','success');await loadData();
+  });
+
+  document.getElementById('wd-toggle-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    const wd=appSettings.withdraw||{};
+    await refs.settings.child('withdraw').update({...wd, enabled: document.getElementById('s-wd-enabled').checked});
+    showAlert('s-alert','✅ Withdraw settings saved','success');await loadData();
+  });
+
+  document.getElementById('ad-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    await refs.settings.child('ads').update({
+      adsterraDirectLink: document.getElementById('s-ad-link').value.trim(),
+      step_timer_seconds: Number(document.getElementById('s-ad-timer').value)||8,
+    });
+    showAlert('s-alert','✅ Ad settings saved','success');await loadData();
+  });
+}
+
+// ============ AI SETTINGS ============
+function renderAISettings(){
+  const ai=appSettings.ai||{};const key=appSettings.aiApiKey||ai.apiKey||'';
+  document.getElementById('page-content').innerHTML=`
+    ${pageHeader('AI Settings','robot')}
+    <div id="s-alert" class="alert hidden"></div>
+    <div class="card"><h3 class="card-title"><i class="fas fa-robot" style="color:var(--primary)"></i> AI Chat Assistant</h3>
+      <form id="ai-form">
+        <div class="checkbox-row"><input type="checkbox" id="s-ai-enabled" ${ai.enabled!==false?'checked':''}><label for="s-ai-enabled">Enable AI Chat</label></div>
+        <div class="form-group"><label class="form-label">API URL</label><input type="url" id="s-ai-url" class="form-input" value="${esc(ai.apiURL||'https://api.openai.com/v1/chat/completions')}"></div>
+        <div class="form-group"><label class="form-label">API Key</label><input type="password" id="s-ai-key" class="form-input" value="${esc(key)}"></div>
+        <div class="form-group"><label class="form-label">Model</label><input type="text" id="s-ai-model" class="form-input" value="${esc(ai.model||'gpt-4o-mini')}"></div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>`;
+  document.getElementById('ai-form').addEventListener('submit',async (e)=>{
+    e.preventDefault();
+    const k=document.getElementById('s-ai-key').value.trim();
+    await refs.settings.child('ai').update({enabled:document.getElementById('s-ai-enabled').checked,apiURL:document.getElementById('s-ai-url').value.trim(),apiKey:k,model:document.getElementById('s-ai-model').value.trim()||'gpt-4o-mini'});
+    await refs.settings.child('aiApiKey').set(k);
+    showAlert('s-alert','✅ Saved','success');await loadData();
+  });
+}
+
+// ============ EXPOSE ============
+window.toggleSidebar=toggleSidebar;window.loadPage=loadPage;window.logout=logout;window.loadData=loadData;window.closeModal=closeModal;window.closeConfirmModal=closeConfirmModal;
+window.openFileForm=openFileForm;window.editFile=editFile;window.deleteFile=deleteFile;window.approveFile=approveFile;window.rejectFile=rejectFile;window.autoSlug=autoSlug;
+window.openBannerForm=openBannerForm;window.deleteBanner=deleteBanner;
+window.openAdminPromptForm=openAdminPromptForm;window.editAdminPrompt=openAdminPromptForm;window.deleteAdminPrompt=deleteAdminPrompt;
+window.approvePrompt=approvePrompt;window.rejectPrompt=rejectPrompt;window.viewPrompt=viewPrompt;window.editPromptAdmin=editPromptAdmin;window.deletePrompt=deletePrompt;
+window.toggleBan=toggleBan;window.adjustBalance=adjustBalance;window.editUser=editUser;window.deleteNotif=deleteNotif;
+window.addMethod=addMethod;window.removeMethod=removeMethod;window.approveWd=approveWd;window.rejectWd=rejectWd;window.saveMethodSettings=saveMethodSettings;
+
+if(window.innerWidth<768){document.querySelectorAll('.hidden-md-up').forEach(el=>el.style.display='flex')}
+console.log('✅ FileHub Admin Panel ready');
+</script>
+</body>
+</html>
