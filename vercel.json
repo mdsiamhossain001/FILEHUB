@@ -2,10 +2,9 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/admin", "dest": "/FILEHUB.html" },
-    { "src": "/admin/(.*)", "dest": "/FILEHUB.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/admin", "destination": "/FILEHUB.html" },
+    { "source": "/admin/(.*)", "destination": "/FILEHUB.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
