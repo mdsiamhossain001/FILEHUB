@@ -79,6 +79,8 @@
         @media (min-width: 768px) { .prompt-file-badge, .apk-file-badge { top: 10px; left: 10px; padding: 3px 10px; font-size: .65rem; } }
         .prompt-file-badge { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
         .apk-file-badge { background: linear-gradient(135deg, #10b981, #34d399); }
+        .points-badge-card { position: absolute; top: 6px; right: 6px; color: #fff; padding: 2px 6px; border-radius: 20px; font-size: .55rem; font-weight: 700; z-index: 3; background: linear-gradient(135deg, #f59e0b, #f97316); white-space: nowrap; }
+        @media (min-width: 768px) { .points-badge-card { top: 10px; right: 10px; padding: 3px 10px; font-size: .65rem; } }
         .section-header { display: flex; align-items: center; gap: 10px; margin: 24px 0 14px; }
         .section-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.15rem; margin: 0; }
         @media (min-width: 768px) { .section-header h2 { font-size: 1.4rem; } .section-header { margin: 30px 0 20px; } }
@@ -202,6 +204,7 @@
         .alert-success { background: #d1fae5; color: #065f46; }
         .alert-error { background: #fee2e2; color: #991b1b; }
         .alert-info { background: #dbeafe; color: #1e40af; }
+        .alert-warning { background: #fef3c7; color: #92400e; }
         .hidden { display: none !important; }
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg); padding: 5px; border-radius: 50px; }
         .auth-tab { flex: 1; padding: 12px; text-align: center; border-radius: 50px; cursor: pointer; font-weight: 600; }
@@ -464,6 +467,7 @@
     let isNotifInDetail = false;
     let dataLoaded = false;
     let dataLoadingPromise = null;
+    let userDataListener = null;
 
     let AD_REQUIRED_SECONDS = 8;
     function getAdSeconds() {
@@ -548,11 +552,11 @@
         const p = appSettings.points || {};
         return {
             uploadReward: p.uploadReward !== undefined ? Number(p.uploadReward) : 10,
-            downloadReward: p.downloadReward !== undefined ? Number(p.downloadReward) : 2,
+            downloadReward: p.downloadReward !== undefined ? Number(p.downloadReward) : 0,
             uploaderReward: p.uploaderReward !== undefined ? Number(p.uploaderReward) : 5,
             uploaderEarnsOnDownload: p.uploaderEarnsOnDownload !== false,
             promptUploadReward: p.promptUploadReward !== undefined ? Number(p.promptUploadReward) : 15,
-            promptDownloadReward: p.promptDownloadReward !== undefined ? Number(p.promptDownloadReward) : 3,
+            promptDownloadReward: p.promptDownloadReward !== undefined ? Number(p.promptDownloadReward) : 0,
             promptUploaderReward: p.promptUploaderReward !== undefined ? Number(p.promptUploaderReward) : 8
         };
     }
@@ -572,10 +576,30 @@
             await usersRef.child(uid).child('balance').transaction(c => (c || 0) + amount);
             await pointLogsRef.child(uid).push({ amount, reason: reason || 'system', timestamp: Date.now() });
             return true;
-        } catch(e) { return false; }
+        } catch(e) { console.error('addPoints:', e); return false; }
     }
 
-    // ⭐ UNIFIED TRANSACTION (EARN ONLY — no deduction from downloader)
+    async function deductPointsFromUser(uid, amount, reason) {
+        if (!uid || !amount) return false;
+        let success = false;
+        await usersRef.child(uid).child('balance').transaction(c => {
+            const cur = c || 0;
+            if (cur < amount) { success = false; return cur; }
+            success = true;
+            return cur - amount;
+        });
+        if (success) {
+            await pointLogsRef.child(uid).push({ amount: -amount, reason: reason || 'system', timestamp: Date.now() });
+        }
+        return success;
+    }
+
+    // ⭐ TRANSACTION: per-item points + global fallback
+    // Rules:
+    //  - Downloader/Viewer: NO charge (earn-only model)
+    //  - Uploader: gets points (per-item override > global)
+    //  - Own content: no points
+    //  - Admin content: no points
     async function executeTransaction(item, isPrompt) {
         if (!currentUser) return { ok: true, earned: 0, reason: 'guest' };
         
@@ -585,14 +609,29 @@
         
         if (isOwn) return { ok: true, earned: 0, reason: 'own_content' };
         
+        // Duplicate prevention
         const txKey = 'tx_' + currentUser.uid + '_' + item.id;
         if (localStorage.getItem(txKey)) return { ok: true, earned: 0, reason: 'already_processed' };
         
         let earned = 0;
         
-        // ⭐ ONLY reward uploader (no deduction from downloader)
+        // ⭐ Uploader reward (per-item override > global)
         if (!isAdminOwner && ps.uploaderEarnsOnDownload) {
-            const reward = isPrompt ? ps.promptUploaderReward : ps.uploaderReward;
+            let reward;
+            if (isPrompt) {
+                if (item.uploaderPoints !== undefined && item.uploaderPoints !== null) {
+                    reward = Number(item.uploaderPoints);
+                } else {
+                    reward = ps.promptUploaderReward;
+                }
+            } else {
+                if (item.uploaderPoints !== undefined && item.uploaderPoints !== null) {
+                    reward = Number(item.uploaderPoints);
+                } else {
+                    reward = ps.uploaderReward;
+                }
+            }
+            
             if (reward > 0) {
                 const success = await addPointsToUser(
                     item.uploadedBy, 
@@ -603,6 +642,7 @@
             }
         }
         
+        // Mark processed
         localStorage.setItem(txKey, '1');
         return { ok: true, earned, reason: 'success' };
     }
@@ -622,7 +662,8 @@
             prompt_text: p.prompt || '',
             detail_photos: p.detail_photos || [],
             created_at: p.created_at || Date.now(),
-            uploadedBy: 'admin'
+            uploadedBy: 'admin',
+            uploaderPoints: p.uploaderPoints !== undefined ? p.uploaderPoints : undefined
         }));
         const userPrompts = allFiles
             .filter(f => f.isPromptUpload === true && f.status === 'approved')
@@ -682,9 +723,20 @@
                     localStorage.setItem('theme', currentUserData.theme);
                 }
                 loadNotifications();
+                // ⭐ Live listener for balance updates
+                if (userDataListener) userDataListener.off();
+                userDataListener = usersRef.child(user.uid);
+                userDataListener.on('value', snap => {
+                    if (snap.exists()) {
+                        currentUserData = snap.val();
+                        // Refresh profile if on it
+                        if (currentRoute === '/profile') renderProfile();
+                    }
+                });
             } catch(e) { console.error(e); }
         } else {
             currentUser = null; currentUserData = null; allNotifications = []; updateBadge();
+            if (userDataListener) { userDataListener.off(); userDataListener = null; }
         }
         handleRoute();
     });
@@ -1166,7 +1218,18 @@
         const badge = isAI ? '<span class="prompt-file-badge">' + cssEmoji('magic') + ' AI Prompt</span>' 
             : isAPK ? '<span class="apk-file-badge">' + cssEmoji('apk') + ' APK</span>' : '';
         const ext = isAI ? 'ai' : (f.file_extension || 'file');
-        return '<div class="file-card" onclick="navigateTo(\'/file/' + f.id + '\')">' + badge +
+        
+        // ⭐ Show points badge if uploader reward exists
+        let pointsBadge = '';
+        if (f.uploaderPoints !== undefined && f.uploaderPoints !== null && Number(f.uploaderPoints) > 0) {
+            pointsBadge = '<span class="points-badge-card">+' + f.uploaderPoints + ' pts</span>';
+        } else {
+            const ps = getPointSettings();
+            const r = isAI ? ps.promptUploaderReward : ps.uploaderReward;
+            if (r > 0) pointsBadge = '<span class="points-badge-card">+' + r + ' pts</span>';
+        }
+        
+        return '<div class="file-card" onclick="navigateTo(\'/file/' + f.id + '\')">' + badge + pointsBadge +
             '<div class="card-thumb-wrap">' +
                 '<img src="' + escapeHtmlUser(f.thumbnail_url || 'https://i.postimg.cc/VkCqsjD1/file-00000000fa18821191576f156d4e3bfe.png') + '" class="card-thumb" loading="lazy" onerror="this.src=\'https://i.postimg.cc/VkCqsjD1/file-00000000fa18821191576f156d4e3bfe.png\'">' +
             '</div>' +
@@ -1270,7 +1333,7 @@
         
         try { hljs.highlightAll(); } catch(e) {}
 
-        // ⭐ Direct prompt transaction — only reward uploader, no charge (EARN ONLY)
+        // ⭐ Direct prompt transaction — reward uploader only, no charge (EARN ONLY)
         if (type === 'prompt' && currentUser) {
             const isOwn = item.uploadedBy === currentUser.uid;
             const req = item.required_ads || 0;
@@ -1294,6 +1357,19 @@
         const pageTitle = item.title || 'FileHub';
         const isOwn = currentUser && item.uploadedBy === currentUser.uid;
 
+        // Show points reward preview
+        const ps = getPointSettings();
+        let uploaderReward = 0;
+        if (isAI) {
+            uploaderReward = (item.uploaderPoints !== undefined && item.uploaderPoints !== null) 
+                ? Number(item.uploaderPoints) 
+                : ps.promptUploaderReward;
+        } else {
+            uploaderReward = (item.uploaderPoints !== undefined && item.uploaderPoints !== null) 
+                ? Number(item.uploaderPoints) 
+                : ps.uploaderReward;
+        }
+
         if (watched < req && req > 0) {
             zone.innerHTML = 
                 '<div class="unlock-actions">' +
@@ -1306,6 +1382,10 @@
         }
 
         if (isAI) {
+            const rewardMsg = (!isOwn && uploaderReward > 0) 
+                ? '<div style="text-align:center;margin-top:10px;font-size:.85rem;color:#10b981;font-weight:600;">' + cssEmoji('money') + ' আপলোডার +' + uploaderReward + ' পয়েন্ট পাবেন</div>'
+                : '';
+            
             zone.innerHTML = 
                 '<div class="prompt-card">' +
                     '<div class="prompt-card-header">' +
@@ -1326,17 +1406,21 @@
                         '<button class="prompt-action-btn gemini-btn-main" onclick="openGemini(\'' + escapeHtmlUser(item.prompt_text || '').replace(/'/g, "\\'").replace(/\n/g, '\\n') + '\')">' +
                             '<i class="fas fa-gem"></i> Open Gemini AI' +
                         '</button>' +
-                    '</div>' +
+                    '</div>' + rewardMsg +
                     '<div id="dlStatus" style="text-align:center;margin-top:10px;font-size:.85rem;color:var(--text-sub);"></div>' +
                 '</div>';
         } else {
+            const rewardMsg = (!isOwn && uploaderReward > 0) 
+                ? '<div style="text-align:center;margin-top:10px;font-size:.85rem;color:#10b981;font-weight:600;">' + cssEmoji('money') + ' আপলোডার +' + uploaderReward + ' পয়েন্ট পাবেন</div>'
+                : '';
+            
             zone.innerHTML = 
                 '<div class="unlock-actions">' +
                     '<button class="unlock-btn" id="dlBtn">' + cssEmoji('download') + ' Download Now' + (isOwn ? ' (Your File)' : '') + '</button>' +
                     '<button class="prompt-action-btn share-btn-main" style="flex: 0 0 120px; border-radius: 12px; padding: 16px;" onclick="sharePrompt(this, \'' + shareUrl.replace(/'/g, "\\'") + '\', \'' + pageTitle.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\')">' +
                         '<i class="fas fa-share-nodes"></i> Share' +
                     '</button>' +
-                '</div>' +
+                '</div>' + rewardMsg +
                 '<div id="dlStatus" style="text-align:center;margin-top:10px;font-size:.85rem;color:var(--text-sub);"></div>';
             const dlBtn = document.getElementById('dlBtn');
             if (dlBtn) dlBtn.onclick = () => handleDownload(type, item, dlBtn);
@@ -1353,7 +1437,7 @@
         
         const isPrompt = type === 'prompt' || item.isPromptUpload === true;
         
-        // ⭐ Execute transaction (EARN ONLY — no deduction)
+        // Execute transaction (EARN ONLY — no deduction)
         const tx = await executeTransaction(item, isPrompt);
         
         if (tx.earned > 0) {
@@ -1370,7 +1454,7 @@
         window.location.href = item.download_url;
     }
 
-    // ⭐ Prompt transaction (after ads completed — EARN ONLY)
+    // ⭐ Prompt transaction (EARN ONLY)
     async function executePromptTransaction(item) {
         const tx = await executeTransaction(item, true);
         
@@ -1394,7 +1478,7 @@
         return tx;
     }
 
-    // ⭐ Copy Prompt (no charge)
+    // ⭐ Copy Prompt
     window.copyMainPrompt = function(btn) {
         const box = document.getElementById('promptTextBox');
         if (!box) return;
@@ -1567,7 +1651,6 @@
         }, 500);
     };
 
-    // ⭐ COMPLETE AD UNLOCK (EARN ONLY — no charge)
     async function completeAdUnlock() {
         if (adUnlockCompleted) return;
         adUnlockCompleted = true;
@@ -1640,7 +1723,7 @@
         inner.addEventListener('touchend', e => { eX = e.changedTouches[0].screenX; if (eX < sX - 50) next(); if (eX > sX + 50) prev(); interval = setInterval(next, 5000); }, {passive:true});
     }
 
-    // ==================== UPLOAD ====================
+    // ==================== UPLOAD (points added by ADMIN on approve) ====================
     function renderUpload() {
         document.title = 'Upload - FileHub';
         const ps = getPointSettings();
@@ -1651,9 +1734,9 @@
                     '<button class="tab-switcher-btn active" onclick="switchUploadTab(\'file\', event)">' + cssEmoji('folder') + ' File</button>' +
                     '<button class="tab-switcher-btn" onclick="switchUploadTab(\'prompt\', event)">' + cssEmoji('magic') + ' AI Prompt</button>' +
                 '</div>' +
-                '<div id="uploadAlert" class="alert hidden"></div>' +
+                '<div id="uploadAlert" class="alert alert-info">' + cssEmoji('info') + ' এডমিন approve করলে আপনি পয়েন্ট পাবেন — ফাইল: <b>+' + ps.uploadReward + '</b> | প্রমোট: <b>+' + ps.promptUploadReward + '</b></div>' +
+                '<div id="uploadAlert2" class="alert hidden"></div>' +
                 '<div id="fileUploadForm">' +
-                    '<div class="alert alert-info" style="margin-bottom:16px;">' + cssEmoji('money') + ' আপলোড করলে আপনি <b>' + ps.uploadReward + ' পয়েন্ট</b> পাবেন!</div>' +
                     '<form id="uploadFileForm">' +
                         '<div class="form-group"><label class="form-label">Title</label><input type="text" id="uf-title" class="form-control" required></div>' +
                         '<div class="form-group"><label class="form-label">Description (Markdown)</label><textarea id="uf-desc" class="form-control" rows="4"></textarea></div>' +
@@ -1661,12 +1744,11 @@
                         '<div class="form-group"><label class="form-label">Thumbnail URL</label><input type="url" id="uf-thumb" class="form-control" required></div>' +
                         '<div class="form-group"><label class="form-label">Download URL</label><input type="url" id="uf-dl" class="form-control" required></div>' +
                         '<div class="form-group"><label class="form-label">Detail Photos (comma separated)</label><textarea id="uf-photos" class="form-control" rows="2"></textarea></div>' +
-                        '<div class="upload-notice">' + cssEmoji('info') + '<span>Admin approval required. Points will be added after upload.</span></div>' +
+                        '<div class="upload-notice">' + cssEmoji('info') + '<span>Admin approval required. Points will be added after approval.</span></div>' +
                         '<button type="submit" class="btn btn-primary" style="margin-top:16px;" id="uf-btn">' + cssEmoji('upload') + ' Upload File</button>' +
                     '</form>' +
                 '</div>' +
                 '<div id="promptUploadForm" class="hidden">' +
-                    '<div class="alert alert-info" style="margin-bottom:16px;">' + cssEmoji('magic') + ' AI Prompt আপলোড করলে আপনি <b>' + ps.promptUploadReward + ' পয়েন্ট</b> পাবেন!</div>' +
                     '<form id="uploadPromptForm">' +
                         '<div class="form-group"><label class="form-label">Prompt Title</label><input type="text" id="up-title" class="form-control" placeholder="e.g., Realistic Portrait" required></div>' +
                         '<div class="form-group"><label class="form-label">Prompt Text</label><textarea id="up-text" class="form-control" rows="5" placeholder="A photorealistic portrait..." required style="font-family:monospace;font-size:.85rem;"></textarea></div>' +
@@ -1687,6 +1769,7 @@
             else { fileF.classList.remove('hidden'); promptF.classList.add('hidden'); }
         };
 
+        // ⭐ File upload — NO POINTS added here (only admin approve adds points)
         document.getElementById('uploadFileForm').addEventListener('submit', async e => {
             e.preventDefault();
             const btn = document.getElementById('uf-btn');
@@ -1701,29 +1784,25 @@
                 detail_photos: document.getElementById('uf-photos').value.split(',').map(s => s.trim()).filter(Boolean),
                 status: 'pending', created_at: Date.now(), total_downloads: 0,
                 uploadedBy: currentUser.uid, uploadedByEmail: currentUser.email,
-                isPromptUpload: false
+                isPromptUpload: false,
+                pointsAwarded: false
             };
             try {
                 await filesRef.push(data);
-                const reward = ps.uploadReward;
-                if (reward > 0) {
-                    await addPointsToUser(currentUser.uid, reward, 'upload:' + data.title);
-                    const snap = await usersRef.child(currentUser.uid).once('value');
-                    currentUserData = snap.val() || currentUserData;
-                }
-                const el = document.getElementById('uploadAlert');
+                const el = document.getElementById('uploadAlert2');
                 el.className = 'alert alert-success';
-                el.innerText = '✅ Uploaded! ' + reward + ' পয়েন্ট যোগ হয়েছে।';
+                el.innerText = '✅ File uploaded! এডমিন approve করলে আপনি ' + getPointSettings().uploadReward + ' পয়েন্ট পাবেন।';
                 document.getElementById('uploadFileForm').reset();
                 setTimeout(() => navigateTo('/profile'), 2000);
             } catch(err) {
-                const el = document.getElementById('uploadAlert');
+                const el = document.getElementById('uploadAlert2');
                 el.className = 'alert alert-error';
                 el.innerText = err.message;
                 btn.disabled = false; btn.innerText = 'Upload File';
             }
         });
 
+        // ⭐ Prompt upload — NO POINTS added here
         document.getElementById('uploadPromptForm').addEventListener('submit', async e => {
             e.preventDefault();
             const btn = document.getElementById('up-btn');
@@ -1739,23 +1818,18 @@
                 status: 'pending',
                 isPromptUpload: true,
                 created_at: Date.now(), total_downloads: 0,
-                uploadedBy: currentUser.uid, uploadedByEmail: currentUser.email
+                uploadedBy: currentUser.uid, uploadedByEmail: currentUser.email,
+                pointsAwarded: false
             };
             try {
                 await filesRef.push(data);
-                const reward = ps.promptUploadReward;
-                if (reward > 0) {
-                    await addPointsToUser(currentUser.uid, reward, 'upload_prompt:' + data.title);
-                    const snap = await usersRef.child(currentUser.uid).once('value');
-                    currentUserData = snap.val() || currentUserData;
-                }
-                const el = document.getElementById('uploadAlert');
+                const el = document.getElementById('uploadAlert2');
                 el.className = 'alert alert-success';
-                el.innerText = '✅ Prompt uploaded! ' + reward + ' পয়েন্ট যোগ হয়েছে।';
+                el.innerText = '✅ Prompt uploaded! এডমিন approve করলে আপনি ' + getPointSettings().promptUploadReward + ' পয়েন্ট পাবেন।';
                 document.getElementById('uploadPromptForm').reset();
                 setTimeout(() => navigateTo('/profile'), 2000);
             } catch(err) {
-                const el = document.getElementById('uploadAlert');
+                const el = document.getElementById('uploadAlert2');
                 el.className = 'alert alert-error';
                 el.innerText = err.message;
                 btn.disabled = false; btn.innerText = 'Upload Prompt';
@@ -1802,9 +1876,9 @@
             '<div class="uploads-section">' +
                 '<h2 class="uploads-title">' + cssEmoji('upload') + ' Your Uploads</h2>' +
                 '<div style="display:flex;gap:15px;margin-bottom:16px;font-size:.85rem;">' +
-                    '<span style="color:#10b981;">' + cssEmoji('check') + ' ' + approved + '</span>' +
-                    '<span style="color:#f59e0b;">' + cssEmoji('clock') + ' ' + pending + '</span>' +
-                    '<span style="color:#ef4444;">' + cssEmoji('times') + ' ' + rejected + '</span>' +
+                    '<span style="color:#10b981;">' + cssEmoji('check') + ' ' + approved + ' approved</span>' +
+                    '<span style="color:#f59e0b;">' + cssEmoji('clock') + ' ' + pending + ' pending</span>' +
+                    '<span style="color:#ef4444;">' + cssEmoji('times') + ' ' + rejected + ' rejected</span>' +
                 '</div>' +
                 '<div class="file-grid">' +
                     (userFiles.length === 0 
@@ -1813,7 +1887,10 @@
                             const cls = f.status === 'approved' ? 'status-approved' : f.status === 'pending' ? 'status-pending' : 'status-rejected';
                             const statusIcon = f.status === 'approved' ? cssEmoji('check') : f.status === 'pending' ? cssEmoji('clock') : cssEmoji('times');
                             const badge = f.isPromptUpload ? '<span class="prompt-file-badge">' + cssEmoji('magic') + ' Prompt</span>' : '';
-                            return '<div class="file-card" onclick="navigateTo(\'/file/' + f.id + '\')">' + badge +
+                            const pointsBadge = (f.status === 'approved' && f.uploadPoints) 
+                                ? '<span class="points-badge-card">+' + f.uploadPoints + ' pts</span>' 
+                                : '';
+                            return '<div class="file-card" onclick="navigateTo(\'/file/' + f.id + '\')">' + badge + pointsBadge +
                                 '<div class="card-thumb-wrap"><img src="' + escapeHtmlUser(f.thumbnail_url || '') + '" class="card-thumb" loading="lazy" onerror="this.src=\'https://i.postimg.cc/VkCqsjD1/file-00000000fa18821191576f156d4e3bfe.png\'"></div>' +
                                 '<div class="card-body"><div class="card-title">' + escapeHtmlUser(f.title) + '</div>' +
                                 '<div class="card-footer"><span class="status-badge ' + cls + '">' + statusIcon + ' ' + (f.status || 'pending') + '</span>' +
@@ -1922,22 +1999,6 @@
             ).join('') + '</div>');
         openModal('pointHistoryModal');
     };
-
-    // Deduct function kept only for withdraw (admin-triggered)
-    async function deductPointsFromUser(uid, amount, reason) {
-        if (!uid || !amount) return false;
-        let success = false;
-        await usersRef.child(uid).child('balance').transaction(c => {
-            const cur = c || 0;
-            if (cur < amount) { success = false; return cur; }
-            success = true;
-            return cur - amount;
-        });
-        if (success) {
-            await pointLogsRef.child(uid).push({ amount: -amount, reason: reason || 'system', timestamp: Date.now() });
-        }
-        return success;
-    }
 
     window.logout = async function() { await auth.signOut(); dataLoaded = false; dataLoadingPromise = null; navigateTo('/'); };
 
