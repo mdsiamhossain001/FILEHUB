@@ -477,7 +477,6 @@
     const SVG_EXPAND = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
     const SVG_COLLAPSE = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
 
-    // ==================== DOM ====================
     const app = document.getElementById('app');
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
@@ -566,6 +565,7 @@
         };
     }
 
+    // ==================== POINTS (EARN ONLY) ====================
     async function addPointsToUser(uid, amount, reason) {
         if (!uid || !amount) return false;
         try {
@@ -574,19 +574,37 @@
             return true;
         } catch(e) { return false; }
     }
-    async function deductPointsFromUser(uid, amount, reason) {
-        if (!uid || !amount) return false;
-        let success = false;
-        await usersRef.child(uid).child('balance').transaction(c => {
-            const cur = c || 0;
-            if (cur < amount) { success = false; return cur; }
-            success = true;
-            return cur - amount;
-        });
-        if (success) {
-            await pointLogsRef.child(uid).push({ amount: -amount, reason: reason || 'system', timestamp: Date.now() });
+
+    // ⭐ UNIFIED TRANSACTION (EARN ONLY — no deduction from downloader)
+    async function executeTransaction(item, isPrompt) {
+        if (!currentUser) return { ok: true, earned: 0, reason: 'guest' };
+        
+        const ps = getPointSettings();
+        const isOwn = item.uploadedBy === currentUser.uid;
+        const isAdminOwner = !item.uploadedBy || item.uploadedBy === 'admin';
+        
+        if (isOwn) return { ok: true, earned: 0, reason: 'own_content' };
+        
+        const txKey = 'tx_' + currentUser.uid + '_' + item.id;
+        if (localStorage.getItem(txKey)) return { ok: true, earned: 0, reason: 'already_processed' };
+        
+        let earned = 0;
+        
+        // ⭐ ONLY reward uploader (no deduction from downloader)
+        if (!isAdminOwner && ps.uploaderEarnsOnDownload) {
+            const reward = isPrompt ? ps.promptUploaderReward : ps.uploaderReward;
+            if (reward > 0) {
+                const success = await addPointsToUser(
+                    item.uploadedBy, 
+                    reward, 
+                    (isPrompt ? 'prompt_copied_by:' : 'downloaded_by:') + currentUser.uid + ':' + item.id
+                );
+                if (success) earned = reward;
+            }
         }
-        return success;
+        
+        localStorage.setItem(txKey, '1');
+        return { ok: true, earned, reason: 'success' };
     }
 
     function getAIPromptFiles() {
@@ -1252,20 +1270,16 @@
         
         try { hljs.highlightAll(); } catch(e) {}
 
-        // ⭐ Direct prompt transaction (0 ads) — only for other's prompts
+        // ⭐ Direct prompt transaction — only reward uploader, no charge (EARN ONLY)
         if (type === 'prompt' && currentUser) {
             const isOwn = item.uploadedBy === currentUser.uid;
-            const txKey = 'prompt_tx_' + currentUser.uid + '_' + item.id;
-            const ps = getPointSettings();
-            const alreadyCharged = localStorage.getItem(txKey);
+            const req = item.required_ads || 0;
+            const txKey = 'tx_' + currentUser.uid + '_' + item.id;
             
-            if (!isOwn && !alreadyCharged && watched >= (item.required_ads || 0) && ps.promptDownloadReward > 0) {
+            if (!isOwn && watched >= req && !localStorage.getItem(txKey)) {
                 setTimeout(async () => {
-                    const tx = await executePromptTransaction(item);
-                    if (tx.charged > 0 || tx.earned > 0) {
-                        if (tx.charged > 0) showToast('-' + tx.charged + ' পয়েন্ট খরচ হয়েছে', 'info');
-                    }
-                }, 1000);
+                    await executePromptTransaction(item);
+                }, 800);
             }
         }
     }
@@ -1298,7 +1312,7 @@
                         '<div class="prompt-card-icon"><i class="fas fa-wand-magic-sparkles"></i></div>' +
                         '<div>' +
                             '<h3 class="prompt-card-title">✨ Prompt Ready' + (isOwn ? ' (Your Prompt)' : '') + '</h3>' +
-                            '<div class="prompt-card-subtitle">' + (isOwn ? 'নিজের প্রমোট — কোনো পয়েন্ট খরচ হবে না' : 'কপি করে Gemini AI-তে ব্যবহার করুন') + '</div>' +
+                            '<div class="prompt-card-subtitle">' + (isOwn ? 'নিজের প্রমোট — কোনো ট্রানজ্যাকশন নেই' : 'কপি করে Gemini AI-তে ব্যবহার করুন') + '</div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="prompt-text-display" id="promptTextBox">' + escapeHtmlUser(item.prompt_text || '') + '</div>' +
@@ -1329,69 +1343,7 @@
         }
     }
 
-    // ==================== ⭐ UNIFIED TRANSACTION LOGIC ====================
-    /**
-     * Universal transaction handler for files & prompts
-     * 
-     * RULES:
-     * - Own file/prompt: NO transaction (0 charged, 0 earned)
-     * - Other's file/prompt:
-     *   - Downloader: -downloadReward / -promptDownloadReward (only if > 0)
-     *   - Uploader: +uploaderReward / +promptUploaderReward (only if > 0 AND uploaderEarnsOnDownload AND not admin)
-     * - Admin-created prompt: uploader earns = 0
-     * - Duplicate prevention via localStorage key
-     */
-    async function executeTransaction(item, isPrompt) {
-        if (!currentUser) return { ok: true, charged: 0, earned: 0, reason: 'guest' };
-        
-        const ps = getPointSettings();
-        const isOwn = item.uploadedBy === currentUser.uid;
-        const isAdminOwner = !item.uploadedBy || item.uploadedBy === 'admin';
-        
-        // Own content — no transaction
-        if (isOwn) {
-            return { ok: true, charged: 0, earned: 0, reason: 'own_content' };
-        }
-        
-        // Duplicate prevention
-        const txKey = 'tx_' + currentUser.uid + '_' + item.id;
-        const alreadyDone = localStorage.getItem(txKey);
-        if (alreadyDone) {
-            return { ok: true, charged: 0, earned: 0, reason: 'already_processed' };
-        }
-        
-        let charged = 0;
-        let earned = 0;
-        
-        // ⭐ STEP 1: Deduct from downloader/unlocker (only if cost > 0)
-        const cost = isPrompt ? ps.promptDownloadReward : ps.downloadReward;
-        if (cost > 0) {
-            const curBal = (currentUserData && currentUserData.balance) || 0;
-            if (curBal < cost) {
-                return { ok: false, charged: 0, earned: 0, reason: 'insufficient', needed: cost, current: curBal };
-            }
-            const ok = await deductPointsFromUser(currentUser.uid, cost, (isPrompt ? 'unlock_prompt:' : 'download:') + item.id);
-            if (!ok) return { ok: false, charged: 0, earned: 0, reason: 'deduct_failed' };
-            currentUserData.balance = curBal - cost;
-            charged = cost;
-        }
-        
-        // ⭐ STEP 2: Reward uploader (only if reward > 0, toggle enabled, not admin, not own)
-        if (!isAdminOwner && ps.uploaderEarnsOnDownload) {
-            const reward = isPrompt ? ps.promptUploaderReward : ps.uploaderReward;
-            if (reward > 0) {
-                await addPointsToUser(item.uploadedBy, reward, (isPrompt ? 'prompt_unlocked_by:' : 'downloaded_by:') + currentUser.uid + ':' + item.id);
-                earned = reward;
-            }
-        }
-        
-        // Mark as processed
-        localStorage.setItem(txKey, '1');
-        
-        return { ok: true, charged, earned, reason: 'success' };
-    }
-
-    // ⭐ Handler for download button
+    // ==================== ⭐ DOWNLOAD (EARN ONLY) ====================
     async function handleDownload(type, item, btnEl) {
         const statusEl = document.getElementById('dlStatus');
         if (!item.download_url) { 
@@ -1401,33 +1353,16 @@
         
         const isPrompt = type === 'prompt' || item.isPromptUpload === true;
         
-        // ⭐ Execute transaction
+        // ⭐ Execute transaction (EARN ONLY — no deduction)
         const tx = await executeTransaction(item, isPrompt);
         
-        if (!tx.ok) {
-            if (tx.reason === 'insufficient') {
-                if (statusEl) statusEl.innerHTML = '❌ পয়েন্ট যথেষ্ট নয়। প্রয়োজন: ' + tx.needed + ' | বর্তমান: ' + tx.current;
-                showToast('❌ পয়েন্ট যথেষ্ট নয়। প্রয়োজন: ' + tx.needed, 'error');
-            } else if (tx.reason === 'deduct_failed') {
-                if (statusEl) statusEl.innerText = '❌ পয়েন্ট কাটা যায়নি';
-                showToast('❌ পয়েন্ট কাটা যায়নি', 'error');
-            }
-            return;
-        }
-        
-        // Show transaction feedback
-        if (tx.charged > 0) {
-            showToast('-' + tx.charged + ' পয়েন্ট খরচ হয়েছে', 'info');
-            if (statusEl) statusEl.innerHTML = '✅ ' + tx.charged + ' পয়েন্ট খরচ হয়েছে';
-        }
         if (tx.earned > 0) {
-            setTimeout(() => showToast('আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন', 'success'), 500);
-        }
-        if (tx.reason === 'own_content') {
-            if (statusEl) statusEl.innerHTML = '✅ নিজের ফাইল — কোনো পয়েন্ট খরচ হবে না';
+            showToast('✅ আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন', 'success');
+            if (statusEl) statusEl.innerHTML = '✅ আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন';
+        } else if (tx.reason === 'own_content') {
+            if (statusEl) statusEl.innerHTML = '✅ নিজের ফাইল — কোনো ট্রানজ্যাকশন নেই';
         }
         
-        // Proceed to download
         if (btnEl) { btnEl.innerText = 'Redirecting...'; btnEl.disabled = true; }
         try {
             await filesRef.child(item.id).child('total_downloads').transaction(c => (c || 0) + 1);
@@ -1435,29 +1370,20 @@
         window.location.href = item.download_url;
     }
 
-    // ⭐ Handler for prompt unlock (called after all ad steps complete)
+    // ⭐ Prompt transaction (after ads completed — EARN ONLY)
     async function executePromptTransaction(item) {
         const tx = await executeTransaction(item, true);
         
-        if (!tx.ok) {
-            if (tx.reason === 'insufficient') {
-                showToast('❌ পয়েন্ট যথেষ্ট নয়। প্রয়োজন: ' + tx.needed + ' | বর্তমান: ' + tx.current, 'error');
-            } else if (tx.reason === 'deduct_failed') {
-                showToast('❌ পয়েন্ট কাটা যায়নি', 'error');
-            }
+        if (tx.earned > 0) {
+            showToast('✅ Prompt ready! আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন', 'success');
+        } else if (tx.reason === 'own_content') {
+            showToast('✅ নিজের প্রমোট — কোনো ট্রানজ্যাকশন নেই', 'info');
+        } else if (tx.reason === 'already_processed') {
+            showToast('✅ Prompt ready!', 'success');
         } else {
-            if (tx.charged > 0) {
-                showToast('✅ Prompt unlocked! -' + tx.charged + ' পয়েন্ট খরচ', 'success');
-            } else if (tx.earned > 0) {
-                showToast('✅ Unlocked! আপলোডার +' + tx.earned + ' পেয়েছেন', 'success');
-            } else if (tx.reason === 'own_content') {
-                showToast('✅ নিজের প্রমোট — কোনো পয়েন্ট খরচ হবে না', 'info');
-            } else if (tx.reason === 'already_processed') {
-                showToast('✅ Prompt unlocked!', 'success');
-            }
+            showToast('✅ Prompt ready!', 'success');
         }
         
-        // Refresh current user balance
         if (currentUser) {
             try {
                 const snap = await usersRef.child(currentUser.uid).once('value');
@@ -1468,7 +1394,7 @@
         return tx;
     }
 
-    // ⭐ Copy Prompt
+    // ⭐ Copy Prompt (no charge)
     window.copyMainPrompt = function(btn) {
         const box = document.getElementById('promptTextBox');
         if (!box) return;
@@ -1641,7 +1567,7 @@
         }, 500);
     };
 
-    // ⭐ COMPLETE AD UNLOCK — with prompt transaction
+    // ⭐ COMPLETE AD UNLOCK (EARN ONLY — no charge)
     async function completeAdUnlock() {
         if (adUnlockCompleted) return;
         adUnlockCompleted = true;
@@ -1655,7 +1581,6 @@
         try {
             const newWatched = pendingAdCurrentWatched + 1;
             
-            // Save watched count
             if (currentUser) {
                 await database.ref('user_file_status/' + currentUser.uid + '_' + pendingAdFileId).set(newWatched);
                 await usersRef.child(currentUser.uid).child('adsWatched').transaction(c => (c || 0) + 1);
@@ -1666,10 +1591,8 @@
             const allDone = newWatched >= pendingAdReq;
             
             if (allDone && pendingAdType === 'prompt') {
-                // ⭐ PROMPT FULLY UNLOCKED → execute transaction
                 const aiPrompts = getAIPromptFiles();
                 const promptItem = aiPrompts.find(p => p.id === pendingAdFileId);
-                
                 if (promptItem && currentUser) {
                     await executePromptTransaction(promptItem);
                 }
@@ -1999,6 +1922,22 @@
             ).join('') + '</div>');
         openModal('pointHistoryModal');
     };
+
+    // Deduct function kept only for withdraw (admin-triggered)
+    async function deductPointsFromUser(uid, amount, reason) {
+        if (!uid || !amount) return false;
+        let success = false;
+        await usersRef.child(uid).child('balance').transaction(c => {
+            const cur = c || 0;
+            if (cur < amount) { success = false; return cur; }
+            success = true;
+            return cur - amount;
+        });
+        if (success) {
+            await pointLogsRef.child(uid).push({ amount: -amount, reason: reason || 'system', timestamp: Date.now() });
+        }
+        return success;
+    }
 
     window.logout = async function() { await auth.signOut(); dataLoaded = false; dataLoadingPromise = null; navigateTo('/'); };
 
