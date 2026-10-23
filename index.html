@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
-    <meta name="description" content="FileHub Premium - Secure File Storage & Sharing Platform">
     <link rel="icon" type="image/png" href="https://i.postimg.cc/VkCqsjD1/file-00000000fa18821191576f156d4e3bfe.png">
     <title>FileHub - Secure File Sharing</title>
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -17,7 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
     <script>
         (function() {
             try {
@@ -26,7 +23,6 @@
             } catch(e) {}
         })();
     </script>
-
     <style>
         :root {
             --primary: #4f46e5; --primary-soft: #e0e7ff; --primary-glow: rgba(79,70,229,0.5);
@@ -48,19 +44,8 @@
         }
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         html, body { overflow-x: hidden; }
-        body { 
-            background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; 
-            padding-bottom: calc(var(--nav-height) + 50px + env(safe-area-inset-bottom, 0px)); 
-            transition: background .3s, color .3s;
-        }
-        
-        .css-emoji {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 1.2em; height: 1.2em; vertical-align: middle;
-            font-family: 'Font Awesome 6 Free', sans-serif; font-weight: 900; line-height: 1;
-        }
-        
-        /* HEADER */
+        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: calc(var(--nav-height) + 50px + env(safe-area-inset-bottom, 0px)); transition: background .3s, color .3s; }
+        .css-emoji { display: inline-flex; align-items: center; justify-content: center; width: 1.2em; height: 1.2em; vertical-align: middle; font-family: 'Font Awesome 6 Free', sans-serif; font-weight: 900; line-height: 1; }
         header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; height: 65px; display: flex; align-items: center; }
         .header-content { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
         .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
@@ -73,58 +58,31 @@
         .ai-icon-img { width: 26px; height: 26px; border-radius: 50%; }
         .notif-badge { position: absolute; top: 5px; right: 5px; background: #ef4444; color: #fff; font-size: .65rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid var(--surface); }
         .notif-badge.active { display: flex; }
-        
         .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
         @media (min-width: 768px) { .container { padding: 20px; } }
-        
-        /* FILE GRID */
         .file-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
         @media (min-width: 768px) { .file-grid { gap: 20px; } }
         @media (max-width: 380px) { .file-grid { gap: 8px; } }
-        
-        .file-card { 
-            background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); 
-            overflow: hidden; cursor: pointer; transition: .25s ease; 
-            display: flex; flex-direction: column; border: 1px solid var(--border); 
-            position: relative; min-width: 0;
-        }
+        .file-card { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; cursor: pointer; transition: .25s ease; display: flex; flex-direction: column; border: 1px solid var(--border); position: relative; min-width: 0; }
         .file-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 12px 32px rgba(79,70,229,0.15); }
         .card-thumb-wrap { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; background: linear-gradient(135deg, var(--primary-soft), var(--bg)); }
         .card-thumb { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
         .file-card:hover .card-thumb { transform: scale(1.05); }
         .card-body { padding: 10px; display: flex; flex-direction: column; flex: 1; min-width: 0; }
         @media (min-width: 768px) { .card-body { padding: 14px; } }
-        .card-title { 
-            font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.82rem; 
-            margin-bottom: 6px; line-height: 1.35; display: -webkit-box; 
-            -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; 
-            height: 2.4em; word-break: break-word;
-        }
+        .card-title { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.82rem; margin-bottom: 6px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.4em; word-break: break-word; }
         @media (min-width: 768px) { .card-title { font-size: 0.95rem; height: 2.5em; } }
         .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--bg); gap: 4px; flex-wrap: wrap; }
-        .meta-pill { 
-            background: var(--primary-soft); color: var(--primary); padding: 2px 6px; 
-            border-radius: 5px; font-size: 0.62rem; font-weight: 600; 
-            display: flex; align-items: center; gap: 3px; white-space: nowrap; 
-            max-width: 100%; overflow: hidden; text-overflow: ellipsis;
-        }
+        .meta-pill { background: var(--primary-soft); color: var(--primary); padding: 2px 6px; border-radius: 5px; font-size: 0.62rem; font-weight: 600; display: flex; align-items: center; gap: 3px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
         @media (min-width: 768px) { .meta-pill { font-size: .72rem; padding: 3px 9px; } }
-        .prompt-file-badge, .apk-file-badge { 
-            position: absolute; top: 6px; left: 6px; color: #fff; padding: 2px 6px; 
-            border-radius: 20px; font-size: .55rem; font-weight: 700; 
-            text-transform: uppercase; z-index: 3; display: flex; align-items: center; 
-            gap: 2px; white-space: nowrap;
-        }
+        .prompt-file-badge, .apk-file-badge { position: absolute; top: 6px; left: 6px; color: #fff; padding: 2px 6px; border-radius: 20px; font-size: .55rem; font-weight: 700; text-transform: uppercase; z-index: 3; display: flex; align-items: center; gap: 2px; white-space: nowrap; }
         @media (min-width: 768px) { .prompt-file-badge, .apk-file-badge { top: 10px; left: 10px; padding: 3px 10px; font-size: .65rem; } }
         .prompt-file-badge { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
         .apk-file-badge { background: linear-gradient(135deg, #10b981, #34d399); }
-        
         .section-header { display: flex; align-items: center; gap: 10px; margin: 24px 0 14px; }
         .section-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.15rem; margin: 0; }
         @media (min-width: 768px) { .section-header h2 { font-size: 1.4rem; } .section-header { margin: 30px 0 20px; } }
         .section-count { background: var(--primary-soft); color: var(--primary); padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; margin-left: auto; }
-        
-        /* CAROUSEL */
         .carousel-wrap { width: 100%; aspect-ratio: 16/9; margin-bottom: 10px; border-radius: 16px; overflow: hidden; position: relative; box-shadow: var(--shadow-md); }
         .carousel-inner { display: flex; height: 100%; transition: transform .5s ease-out; }
         .slide { min-width: 100%; height: 100%; position: relative; cursor: pointer; }
@@ -132,13 +90,7 @@
         .carousel-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; }
         .dot-c { width: 6px; height: 6px; background: var(--border); border-radius: 50%; transition: .3s; }
         .dot-c.active { background: var(--primary); width: 18px; border-radius: 3px; }
-        
-        /* DESCRIPTION */
-        .detail-desc { 
-            background: var(--surface); border-radius: 18px; padding: 24px 22px; margin-top: 24px; 
-            line-height: 1.75; border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.04); 
-            position: relative; overflow: hidden; word-break: break-word;
-        }
+        .detail-desc { background: var(--surface); border-radius: 18px; padding: 24px 22px; margin-top: 24px; line-height: 1.75; border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.04); position: relative; overflow: hidden; word-break: break-word; }
         .detail-desc::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), #818cf8, #a78bfa); }
         .detail-desc h1 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; margin: 24px 0 12px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-soft); }
         .detail-desc h1:first-child { margin-top: 4px; }
@@ -167,163 +119,43 @@
         .detail-desc table th { background: var(--primary); color: #fff; padding: 10px 12px; text-align: left; }
         .detail-desc table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
         .detail-desc.empty { text-align: center; color: var(--text-sub); padding: 40px 20px; font-style: italic; }
-        
-        /* ⭐ PROMPT CARD (NEW - Professional) */
-        .prompt-card {
-            background: linear-gradient(135deg, var(--surface), var(--primary-soft));
-            border-radius: 18px;
-            padding: 22px;
-            margin-top: 24px;
-            border: 2px solid var(--primary);
-            box-shadow: 0 8px 24px rgba(79,70,229,0.15);
-            position: relative;
-            overflow: hidden;
-        }
-        .prompt-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
-            background: linear-gradient(90deg, #8b5cf6, #4f46e5, #6366f1);
-        }
-        .prompt-card-header {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 16px; padding-bottom: 14px;
-            border-bottom: 1px solid var(--border);
-        }
-        .prompt-card-icon {
-            width: 44px; height: 44px; border-radius: 12px;
-            background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 1.3rem; flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-        }
+        .prompt-card { background: linear-gradient(135deg, var(--surface), var(--primary-soft)); border-radius: 18px; padding: 22px; margin-top: 24px; border: 2px solid var(--primary); box-shadow: 0 8px 24px rgba(79,70,229,0.15); position: relative; overflow: hidden; }
+        .prompt-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #8b5cf6, #4f46e5, #6366f1); }
+        .prompt-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+        .prompt-card-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #8b5cf6, #6366f1); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.3rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); }
         .prompt-card-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; margin: 0; }
         .prompt-card-subtitle { font-size: 0.78rem; color: var(--text-sub); margin-top: 2px; }
-        .prompt-text-display {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            line-height: 1.65;
-            color: var(--text-main);
-            white-space: pre-wrap;
-            word-break: break-word;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 16px;
-            position: relative;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
-        }
+        .prompt-text-display { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.65; color: var(--text-main); white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto; margin-bottom: 16px; position: relative; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03); }
         .prompt-text-display::-webkit-scrollbar { width: 6px; }
         .prompt-text-display::-webkit-scrollbar-thumb { background: var(--primary-soft); border-radius: 3px; }
-        
-        /* ACTION BUTTONS BELOW PROMPT */
-        .prompt-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 12px;
-        }
+        .prompt-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
         @media (max-width: 380px) { .prompt-actions { grid-template-columns: 1fr; } }
-        
-        .prompt-action-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 700;
-            font-size: 0.92rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            font-family: inherit;
-            position: relative;
-            overflow: hidden;
-        }
+        .prompt-action-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.25s ease; font-family: inherit; position: relative; overflow: hidden; }
         .prompt-action-btn:active { transform: scale(0.97); }
-        
-        .prompt-action-btn.copy-btn-main {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: #fff;
-            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
-        }
-        .prompt-action-btn.copy-btn-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(79, 70, 229, 0.45);
-        }
-        .prompt-action-btn.copy-btn-main.copied {
-            background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
-        }
-        
-        .prompt-action-btn.share-btn-main {
-            background: var(--surface);
-            color: var(--text-main);
-            border: 2px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        }
-        .prompt-action-btn.share-btn-main:hover {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px var(--primary-glow);
-        }
-        
-        .prompt-action-btn.gemini-btn-main {
-            background: linear-gradient(135deg, #a855f7, #8b5cf6);
-            color: #fff;
-            box-shadow: 0 6px 18px rgba(168, 85, 247, 0.35);
-            grid-column: span 2;
-        }
-        .prompt-action-btn.gemini-btn-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(168, 85, 247, 0.45);
-        }
+        .prompt-action-btn.copy-btn-main { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35); }
+        .prompt-action-btn.copy-btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(79, 70, 229, 0.45); }
+        .prompt-action-btn.copy-btn-main.copied { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35); }
+        .prompt-action-btn.share-btn-main { background: var(--surface); color: var(--text-main); border: 2px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .prompt-action-btn.share-btn-main:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 20px var(--primary-glow); }
+        .prompt-action-btn.gemini-btn-main { background: linear-gradient(135deg, #a855f7, #8b5cf6); color: #fff; box-shadow: 0 6px 18px rgba(168, 85, 247, 0.35); grid-column: span 2; }
+        .prompt-action-btn.gemini-btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(168, 85, 247, 0.45); }
         @media (max-width: 380px) { .prompt-action-btn.gemini-btn-main { grid-column: span 1; } }
-        
-        /* NAVIGATION */
-        .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height); 
-            background: var(--surface); border-top: 1px solid var(--border); 
-            display: grid; grid-template-columns: 1fr 90px 1fr; align-items: center; 
-            z-index: 1001; padding-bottom: env(safe-area-inset-bottom, 0px); 
-            box-sizing: content-box; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-        }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height); background: var(--surface); border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 90px 1fr; align-items: center; z-index: 1001; padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: content-box; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
         [data-theme="dark"] .bottom-nav { box-shadow: 0 -4px 20px rgba(0,0,0,0.4); }
         .nav-col { display: flex; justify-content: center; align-items: center; height: 100%; }
-        .nav-item { 
-            background: none; border: none; color: var(--text-sub); cursor: pointer; 
-            padding: 12px 16px; display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; gap: 3px; border-radius: 12px; 
-            transition: all .25s ease; font-family: inherit;
-        }
+        .nav-item { background: none; border: none; color: var(--text-sub); cursor: pointer; padding: 12px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 12px; transition: all .25s ease; font-family: inherit; }
         .nav-item svg { width: 24px; height: 24px; stroke-width: 2; }
         .nav-item .nav-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2px; opacity: 0.8; }
         .nav-item:active { transform: scale(0.92); }
         .nav-item:hover { color: var(--primary); }
-        
         .nav-home-wrapper { position: relative; width: 90px; height: 100%; display: flex; justify-content: center; align-items: flex-start; overflow: visible; }
-        .nav-home { 
-            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
-            width: 64px; height: 64px; 
-            background: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a78bfa 100%);
-            color: #fff; border-radius: 50%; border: 5px solid var(--surface); 
-            display: flex; justify-content: center; align-items: center; 
-            box-shadow: 0 8px 20px var(--primary-glow), inset 0 -2px 6px rgba(0,0,0,0.15), inset 0 2px 6px rgba(255,255,255,0.2);
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
-            z-index: 1002; animation: homeFloat 3s ease-in-out infinite;
-        }
+        .nav-home { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 64px; height: 64px; background: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a78bfa 100%); color: #fff; border-radius: 50%; border: 5px solid var(--surface); display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px var(--primary-glow), inset 0 -2px 6px rgba(0,0,0,0.15), inset 0 2px 6px rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1002; animation: homeFloat 3s ease-in-out infinite; }
         .nav-home svg { width: 30px; height: 30px; stroke-width: 2.2; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         .nav-home:hover { transform: translateX(-50%) translateY(-4px) scale(1.08); animation: none; }
         .nav-home:active { transform: translateX(-50%) translateY(-2px) scale(0.95); animation: none; }
         @keyframes homeFloat { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-3px); } }
         .nav-home::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #a78bfa); opacity: 0.25; z-index: -1; animation: pulseRing 2s ease-out infinite; }
         @keyframes pulseRing { 0% { transform: scale(1); opacity: 0.35; } 70% { transform: scale(1.35); opacity: 0; } 100% { transform: scale(1.35); opacity: 0; } }
-        
-        /* BOTTOM SHEET */
         .bottom-sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 2000; opacity: 0; visibility: hidden; transition: .3s; }
         .bottom-sheet-overlay.active { opacity: 1; visibility: visible; }
         .bottom-sheet { position: fixed; bottom: 0; left: 0; width: 100%; height: 80vh; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 2001; transform: translateY(100%); transition: transform .3s, height .4s; display: flex; flex-direction: column; }
@@ -333,8 +165,6 @@
         .sheet-title { font-family: 'Outfit', sans-serif; font-weight: 700; text-align: center; }
         .sheet-btn { background: none; border: none; cursor: pointer; color: var(--text-sub); padding: 5px; }
         .sheet-body { flex: 1; overflow-y: auto; }
-        
-        /* CHAT */
         .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; background: var(--bg); }
         .chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: .95rem; line-height: 1.5; word-wrap: break-word; }
         .chat-bubble.user { align-self: flex-end; background: var(--chat-user-bg); color: var(--chat-user-text); }
@@ -345,8 +175,6 @@
         .chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 10px 15px; color: var(--text-main); resize: none; outline: none; font-family: inherit; }
         .chat-send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: #fff; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .chat-send-btn svg { width: 20px; height: 20px; fill: white; }
-        
-        /* AI FILE BUTTONS */
         .ai-file-btn { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 14px; margin: 10px 0; cursor: pointer; transition: all 0.25s; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative; overflow: hidden; text-decoration: none; color: inherit; width: 100%; box-sizing: border-box; }
         .ai-file-btn::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--primary), #818cf8); }
         .ai-file-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,70,229,0.15); }
@@ -357,15 +185,11 @@
         .ai-file-btn-ext { background: linear-gradient(135deg, var(--primary), #818cf8); color: white; padding: 2px 9px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; font-family: 'Outfit', monospace; text-transform: uppercase; letter-spacing: 0.5px; }
         .ai-file-btn-cta { color: var(--primary); font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; gap: 4px; }
         .ai-file-btn-arrow { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
-        
-        /* MODALS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 15px; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: var(--surface); border-radius: 24px; padding: 30px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
         .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; }
         .modal-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 20px; }
-        
-        /* FORMS */
         .form-group { margin-bottom: 16px; }
         .form-label { display: block; font-weight: 600; margin-bottom: 8px; }
         .form-control { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text-main); font-size: 1rem; font-family: inherit; }
@@ -379,13 +203,9 @@
         .alert-error { background: #fee2e2; color: #991b1b; }
         .alert-info { background: #dbeafe; color: #1e40af; }
         .hidden { display: none !important; }
-        
-        /* AUTH */
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg); padding: 5px; border-radius: 50px; }
         .auth-tab { flex: 1; padding: 12px; text-align: center; border-radius: 50px; cursor: pointer; font-weight: 600; }
         .auth-tab.active { background: var(--primary); color: #fff; }
-        
-        /* PROFILE */
         .profile-header { background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%); border-radius: 20px; padding: 25px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; color: #fff; }
         .profile-avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #fff; object-fit: cover; }
         .profile-name { font-size: 1.8rem; font-weight: 700; margin: 0; }
@@ -406,22 +226,16 @@
         .status-approved { background: #d1fae5; color: #065f46; }
         .status-pending { background: #fef3c7; color: #92400e; }
         .status-rejected { background: #fee2e2; color: #991b1b; }
-        
-        /* DETAIL PAGE */
         .unlock-actions { display: flex; gap: 10px; margin-top: 20px; }
         .unlock-btn { flex: 1; background: var(--primary); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 54px; font-size: 1rem; font-family: inherit; }
         .unlock-btn:disabled { background: var(--text-sub); cursor: not-allowed; }
         .detail-title { font-family: 'Outfit', sans-serif; font-size: 1.3rem; margin: 18px 0 12px; }
         .detail-meta-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin-bottom: 10px; }
         .meta-left { justify-self: start; } .meta-center { justify-self: center; } .meta-right { justify-self: end; }
-        
-        /* LIGHTBOX */
         .lightbox-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 4000; display: none; justify-content: center; align-items: center; }
         .lightbox-overlay.active { display: flex; }
         .lightbox-img { max-width: 95%; max-height: 80vh; border-radius: 16px; object-fit: contain; }
         .lightbox-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; cursor: pointer; font-size: 1.5rem; }
-        
-        /* AD POPUP */
         .ad-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 5000; display: none; justify-content: center; align-items: center; }
         .ad-popup-overlay.active { display: flex; }
         .ad-popup { background: var(--surface); border-radius: 20px; padding: 30px; max-width: 420px; width: 90%; text-align: center; position: relative; }
@@ -437,8 +251,6 @@
         .ad-progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin-top: 15px; overflow: hidden; display: none; }
         .ad-progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width .1s linear; }
         .ad-popup-status { margin-top: 15px; font-size: .85rem; color: var(--text-sub); min-height: 20px; }
-        
-        /* MISC */
         .scrolling-notice-container { background: var(--primary); color: #fff; padding: 8px 16px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; overflow: hidden; }
         .scrolling-notice-container i { margin-right: 10px; color: #facc15; }
         .notif-item { padding: 15px 20px; border-bottom: 1px solid var(--bg); cursor: pointer; }
@@ -450,8 +262,6 @@
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-sub); }
         .error-container { text-align: center; padding: 60px 20px; }
         .error-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
-        
-        /* SKELETON (for fast loading) */
         .skeleton { background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         .sk-card { background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
@@ -460,13 +270,9 @@
         .sk-title { height: 16px; width: 85%; margin-bottom: 8px; border-radius: 4px; }
         .sk-meta { height: 12px; width: 50%; border-radius: 4px; }
         @media (min-width: 768px) { .sk-body { padding: 14px; } .sk-title { height: 18px; } .sk-meta { height: 14px; } }
-        
-        /* TOAST */
-        .copy-toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: #10b981; color: #fff; padding: 14px 24px; border-radius: 50px; font-weight: 600; z-index: 10000; transition: transform .3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(16,185,129,0.4); }
+        .copy-toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: #10b981; color: #fff; padding: 14px 24px; border-radius: 50px; font-weight: 600; z-index: 10000; transition: transform .3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(16,185,129,0.4); max-width: 90%; text-align: center; }
         .copy-toast.show { transform: translateX(-50%) translateY(0); }
         .share-toast { background: #4f46e5; box-shadow: 0 10px 30px rgba(79,70,229,0.4); }
-        
-        /* UPLOAD FORM */
         .upload-form { max-width: 550px; margin: 0 auto; background: var(--surface); padding: 22px; border-radius: 20px; box-shadow: var(--shadow-md); }
         .upload-notice { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px; border-radius: 8px; margin-top: 16px; color: #92400e; font-size: .9rem; display: flex; gap: 10px; align-items: flex-start; }
         .no-uploads { text-align: center; padding: 50px 20px; color: var(--text-sub); background: var(--bg); border-radius: 16px; }
@@ -936,7 +742,7 @@
         el.textContent = msg; el.className = 'alert alert-' + type; el.classList.remove('hidden');
     }
 
-    // ==================== FAST DATA LOADING ====================
+    // ==================== DATA LOADING ====================
     async function loadData() {
         if (dataLoaded) return;
         if (dataLoadingPromise) return dataLoadingPromise;
@@ -965,13 +771,6 @@
             } catch(e) { console.error('loadData:', e); }
         })();
         return dataLoadingPromise;
-    }
-
-    // Refresh data (for re-render after updates)
-    async function refreshData() {
-        dataLoaded = false;
-        dataLoadingPromise = null;
-        await loadData();
     }
 
     // ==================== NOTIFICATIONS ====================
@@ -1223,7 +1022,7 @@
         } catch(e) { removeTyping(); appendMessage('ai', '⚠️ ' + e.message); }
     }
 
-    // ==================== ROUTING (FAST) ====================
+    // ==================== ROUTING ====================
     async function handleRoute() {
         let path = currentRoute || window.location.hash.substring(1) || '/';
         if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
@@ -1231,28 +1030,40 @@
 
         clearInterval(bannerInterval); clearInterval(detailInterval);
 
-        // FAST: Show skeleton IMMEDIATELY for home page
         if (path === '/' || path === '/index.html') {
             if (!dataLoaded) {
                 renderHomeSkeleton();
-                // Load data in background
-                loadData().then(() => renderHome());
+                loadData().then(() => {
+                    const siteClosed = appSettings.app && appSettings.app.siteClosed === true;
+                    if (siteClosed && !isAdminUser()) { renderClosed(); return; }
+                    renderHome();
+                });
             } else {
+                const siteClosed = appSettings.app && appSettings.app.siteClosed === true;
+                if (siteClosed && !isAdminUser()) { renderClosed(); return; }
                 renderHome();
             }
         } else if (path.indexOf('/file/') === 0) {
+            const id = decodeURIComponent(path.split('/file/')[1]);
             if (!dataLoaded) {
                 renderDetailSkeleton();
-                loadData().then(() => renderDetail(decodeURIComponent(path.split('/file/')[1])));
+                loadData().then(() => {
+                    const siteClosed = appSettings.app && appSettings.app.siteClosed === true;
+                    if (siteClosed && !isAdminUser()) { renderClosed(); return; }
+                    renderDetail(id);
+                });
             } else {
-                renderDetail(decodeURIComponent(path.split('/file/')[1]));
+                const siteClosed = appSettings.app && appSettings.app.siteClosed === true;
+                if (siteClosed && !isAdminUser()) { renderClosed(); return; }
+                renderDetail(id);
             }
         } else if (path.indexOf('/banner/') === 0) {
+            const id = path.split('/banner/')[1];
             if (!dataLoaded) {
                 renderDetailSkeleton();
-                loadData().then(() => renderBannerDetail(path.split('/banner/')[1]));
+                loadData().then(() => renderBannerDetail(id));
             } else {
-                renderBannerDetail(path.split('/banner/')[1]);
+                renderBannerDetail(id);
             }
         } else if (path === '/upload') {
             if (!dataLoaded) {
@@ -1269,24 +1080,21 @@
         } else {
             renderHome();
         }
+    }
 
-        // Check site closed in background
-        loadData().then(() => {
-            const siteClosed = appSettings.app && appSettings.app.siteClosed === true;
-            if (siteClosed) {
-                const adminUids = (appSettings.admin && appSettings.admin.uids) || [];
-                const isAdmin = currentUser && adminUids.includes(currentUser.uid);
-                if (!isAdmin) {
-                    const msg = (appSettings.app && appSettings.app.siteClosedMessage) || 'সাইট সাময়িকভাবে বন্ধ আছে।';
-                    app.innerHTML = 
-                        '<div style="text-align:center;padding:80px 20px;">' +
-                            '<div style="font-size:5rem;">🚧</div>' +
-                            '<h1 style="font-family:Outfit;font-size:2rem;margin:20px 0;">সাইট বন্ধ আছে</h1>' +
-                            '<p style="color:var(--text-sub);font-size:1.1rem;">' + escapeHtmlUser(msg) + '</p>' +
-                        '</div>';
-                }
-            }
-        });
+    function isAdminUser() {
+        const adminUids = (appSettings.admin && appSettings.admin.uids) || [];
+        return currentUser && adminUids.includes(currentUser.uid);
+    }
+
+    function renderClosed() {
+        const msg = (appSettings.app && appSettings.app.siteClosedMessage) || 'সাইট সাময়িকভাবে বন্ধ আছে।';
+        app.innerHTML = 
+            '<div style="text-align:center;padding:80px 20px;">' +
+                '<div style="font-size:5rem;">🚧</div>' +
+                '<h1 style="font-family:Outfit;font-size:2rem;margin:20px 0;">সাইট বন্ধ আছে</h1>' +
+                '<p style="color:var(--text-sub);font-size:1.1rem;">' + escapeHtmlUser(msg) + '</p>' +
+            '</div>';
     }
 
     function renderHomeSkeleton() {
@@ -1354,7 +1162,7 @@
         '</div>';
     }
 
-    // ==================== MARKDOWN RENDERER ====================
+    // ==================== MARKDOWN ====================
     function renderMarkdown(text) {
         if (!text || !text.trim()) {
             return '<div class="detail-desc empty">— No description available —</div>';
@@ -1443,9 +1251,26 @@
         renderUnlockLogic(type, item, watched);
         
         try { hljs.highlightAll(); } catch(e) {}
+
+        // ⭐ Direct prompt transaction (0 ads) — only for other's prompts
+        if (type === 'prompt' && currentUser) {
+            const isOwn = item.uploadedBy === currentUser.uid;
+            const txKey = 'prompt_tx_' + currentUser.uid + '_' + item.id;
+            const ps = getPointSettings();
+            const alreadyCharged = localStorage.getItem(txKey);
+            
+            if (!isOwn && !alreadyCharged && watched >= (item.required_ads || 0) && ps.promptDownloadReward > 0) {
+                setTimeout(async () => {
+                    const tx = await executePromptTransaction(item);
+                    if (tx.charged > 0 || tx.earned > 0) {
+                        if (tx.charged > 0) showToast('-' + tx.charged + ' পয়েন্ট খরচ হয়েছে', 'info');
+                    }
+                }, 1000);
+            }
+        }
     }
 
-    // ==================== ⭐ UNLOCK LOGIC (PROMPT CARD FIXED) ====================
+    // ==================== UNLOCK LOGIC ====================
     function renderUnlockLogic(type, item, watched) {
         const zone = document.getElementById('unlockSection');
         if (!zone) return;
@@ -1453,8 +1278,8 @@
         const isAI = type === 'prompt';
         const shareUrl = window.location.origin + '/#/file/' + item.id;
         const pageTitle = item.title || 'FileHub';
+        const isOwn = currentUser && item.uploadedBy === currentUser.uid;
 
-        // If not unlocked yet and ads required
         if (watched < req && req > 0) {
             zone.innerHTML = 
                 '<div class="unlock-actions">' +
@@ -1466,16 +1291,14 @@
             return;
         }
 
-        // Unlocked / No ads needed
         if (isAI) {
-            // ⭐ NEW PROFESSIONAL PROMPT CARD
             zone.innerHTML = 
                 '<div class="prompt-card">' +
                     '<div class="prompt-card-header">' +
                         '<div class="prompt-card-icon"><i class="fas fa-wand-magic-sparkles"></i></div>' +
                         '<div>' +
-                            '<h3 class="prompt-card-title">✨ Prompt Ready</h3>' +
-                            '<div class="prompt-card-subtitle">কপি করে Gemini AI-তে ব্যবহার করুন</div>' +
+                            '<h3 class="prompt-card-title">✨ Prompt Ready' + (isOwn ? ' (Your Prompt)' : '') + '</h3>' +
+                            '<div class="prompt-card-subtitle">' + (isOwn ? 'নিজের প্রমোট — কোনো পয়েন্ট খরচ হবে না' : 'কপি করে Gemini AI-তে ব্যবহার করুন') + '</div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="prompt-text-display" id="promptTextBox">' + escapeHtmlUser(item.prompt_text || '') + '</div>' +
@@ -1490,12 +1313,12 @@
                             '<i class="fas fa-gem"></i> Open Gemini AI' +
                         '</button>' +
                     '</div>' +
+                    '<div id="dlStatus" style="text-align:center;margin-top:10px;font-size:.85rem;color:var(--text-sub);"></div>' +
                 '</div>';
         } else {
-            // Regular file - Download + Share
             zone.innerHTML = 
                 '<div class="unlock-actions">' +
-                    '<button class="unlock-btn" id="dlBtn">' + cssEmoji('download') + ' Download Now</button>' +
+                    '<button class="unlock-btn" id="dlBtn">' + cssEmoji('download') + ' Download Now' + (isOwn ? ' (Your File)' : '') + '</button>' +
                     '<button class="prompt-action-btn share-btn-main" style="flex: 0 0 120px; border-radius: 12px; padding: 16px;" onclick="sharePrompt(this, \'' + shareUrl.replace(/'/g, "\\'") + '\', \'' + pageTitle.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\')">' +
                         '<i class="fas fa-share-nodes"></i> Share' +
                     '</button>' +
@@ -1506,7 +1329,146 @@
         }
     }
 
-    // ⭐ NEW: Copy Prompt with Visual Feedback
+    // ==================== ⭐ UNIFIED TRANSACTION LOGIC ====================
+    /**
+     * Universal transaction handler for files & prompts
+     * 
+     * RULES:
+     * - Own file/prompt: NO transaction (0 charged, 0 earned)
+     * - Other's file/prompt:
+     *   - Downloader: -downloadReward / -promptDownloadReward (only if > 0)
+     *   - Uploader: +uploaderReward / +promptUploaderReward (only if > 0 AND uploaderEarnsOnDownload AND not admin)
+     * - Admin-created prompt: uploader earns = 0
+     * - Duplicate prevention via localStorage key
+     */
+    async function executeTransaction(item, isPrompt) {
+        if (!currentUser) return { ok: true, charged: 0, earned: 0, reason: 'guest' };
+        
+        const ps = getPointSettings();
+        const isOwn = item.uploadedBy === currentUser.uid;
+        const isAdminOwner = !item.uploadedBy || item.uploadedBy === 'admin';
+        
+        // Own content — no transaction
+        if (isOwn) {
+            return { ok: true, charged: 0, earned: 0, reason: 'own_content' };
+        }
+        
+        // Duplicate prevention
+        const txKey = 'tx_' + currentUser.uid + '_' + item.id;
+        const alreadyDone = localStorage.getItem(txKey);
+        if (alreadyDone) {
+            return { ok: true, charged: 0, earned: 0, reason: 'already_processed' };
+        }
+        
+        let charged = 0;
+        let earned = 0;
+        
+        // ⭐ STEP 1: Deduct from downloader/unlocker (only if cost > 0)
+        const cost = isPrompt ? ps.promptDownloadReward : ps.downloadReward;
+        if (cost > 0) {
+            const curBal = (currentUserData && currentUserData.balance) || 0;
+            if (curBal < cost) {
+                return { ok: false, charged: 0, earned: 0, reason: 'insufficient', needed: cost, current: curBal };
+            }
+            const ok = await deductPointsFromUser(currentUser.uid, cost, (isPrompt ? 'unlock_prompt:' : 'download:') + item.id);
+            if (!ok) return { ok: false, charged: 0, earned: 0, reason: 'deduct_failed' };
+            currentUserData.balance = curBal - cost;
+            charged = cost;
+        }
+        
+        // ⭐ STEP 2: Reward uploader (only if reward > 0, toggle enabled, not admin, not own)
+        if (!isAdminOwner && ps.uploaderEarnsOnDownload) {
+            const reward = isPrompt ? ps.promptUploaderReward : ps.uploaderReward;
+            if (reward > 0) {
+                await addPointsToUser(item.uploadedBy, reward, (isPrompt ? 'prompt_unlocked_by:' : 'downloaded_by:') + currentUser.uid + ':' + item.id);
+                earned = reward;
+            }
+        }
+        
+        // Mark as processed
+        localStorage.setItem(txKey, '1');
+        
+        return { ok: true, charged, earned, reason: 'success' };
+    }
+
+    // ⭐ Handler for download button
+    async function handleDownload(type, item, btnEl) {
+        const statusEl = document.getElementById('dlStatus');
+        if (!item.download_url) { 
+            if (statusEl) statusEl.innerText = 'Download URL missing.'; 
+            return; 
+        }
+        
+        const isPrompt = type === 'prompt' || item.isPromptUpload === true;
+        
+        // ⭐ Execute transaction
+        const tx = await executeTransaction(item, isPrompt);
+        
+        if (!tx.ok) {
+            if (tx.reason === 'insufficient') {
+                if (statusEl) statusEl.innerHTML = '❌ পয়েন্ট যথেষ্ট নয়। প্রয়োজন: ' + tx.needed + ' | বর্তমান: ' + tx.current;
+                showToast('❌ পয়েন্ট যথেষ্ট নয়। প্রয়োজন: ' + tx.needed, 'error');
+            } else if (tx.reason === 'deduct_failed') {
+                if (statusEl) statusEl.innerText = '❌ পয়েন্ট কাটা যায়নি';
+                showToast('❌ পয়েন্ট কাটা যায়নি', 'error');
+            }
+            return;
+        }
+        
+        // Show transaction feedback
+        if (tx.charged > 0) {
+            showToast('-' + tx.charged + ' পয়েন্ট খরচ হয়েছে', 'info');
+            if (statusEl) statusEl.innerHTML = '✅ ' + tx.charged + ' পয়েন্ট খরচ হয়েছে';
+        }
+        if (tx.earned > 0) {
+            setTimeout(() => showToast('আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন', 'success'), 500);
+        }
+        if (tx.reason === 'own_content') {
+            if (statusEl) statusEl.innerHTML = '✅ নিজের ফাইল — কোনো পয়েন্ট খরচ হবে না';
+        }
+        
+        // Proceed to download
+        if (btnEl) { btnEl.innerText = 'Redirecting...'; btnEl.disabled = true; }
+        try {
+            await filesRef.child(item.id).child('total_downloads').transaction(c => (c || 0) + 1);
+        } catch(e) {}
+        window.location.href = item.download_url;
+    }
+
+    // ⭐ Handler for prompt unlock (called after all ad steps complete)
+    async function executePromptTransaction(item) {
+        const tx = await executeTransaction(item, true);
+        
+        if (!tx.ok) {
+            if (tx.reason === 'insufficient') {
+                showToast('❌ পয়েন্ট যথেষ্ট নয়। প্রয়োজন: ' + tx.needed + ' | বর্তমান: ' + tx.current, 'error');
+            } else if (tx.reason === 'deduct_failed') {
+                showToast('❌ পয়েন্ট কাটা যায়নি', 'error');
+            }
+        } else {
+            if (tx.charged > 0) {
+                showToast('✅ Prompt unlocked! -' + tx.charged + ' পয়েন্ট খরচ', 'success');
+            } else if (tx.earned > 0) {
+                showToast('✅ Unlocked! আপলোডার +' + tx.earned + ' পেয়েছেন', 'success');
+            } else if (tx.reason === 'own_content') {
+                showToast('✅ নিজের প্রমোট — কোনো পয়েন্ট খরচ হবে না', 'info');
+            } else if (tx.reason === 'already_processed') {
+                showToast('✅ Prompt unlocked!', 'success');
+            }
+        }
+        
+        // Refresh current user balance
+        if (currentUser) {
+            try {
+                const snap = await usersRef.child(currentUser.uid).once('value');
+                currentUserData = snap.val() || currentUserData;
+            } catch(e) {}
+        }
+        
+        return tx;
+    }
+
+    // ⭐ Copy Prompt
     window.copyMainPrompt = function(btn) {
         const box = document.getElementById('promptTextBox');
         if (!box) return;
@@ -1544,7 +1506,7 @@
         });
     };
 
-    // ⭐ NEW: Share via Web Share API or Copy Link
+    // ⭐ Share
     window.sharePrompt = async function(btn, url, title) {
         const shareData = {
             title: title + ' - FileHub',
@@ -1560,7 +1522,6 @@
                 await navigator.share(shareData);
                 showToast('✅ Shared successfully!', 'success');
             } else {
-                // Fallback: copy link
                 await navigator.clipboard.writeText(url);
                 showToast('🔗 Link copied! এখন শেয়ার করুন', 'info');
                 const orig = btn.innerHTML;
@@ -1579,9 +1540,7 @@
         }
     };
 
-    // Open Gemini with prompt prefilled (via URL if possible)
     window.openGemini = function(promptText) {
-        // Copy prompt first, then open Gemini
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(promptText).then(() => {
                 showToast('✅ Prompt copied! Gemini-তে paste করুন', 'success');
@@ -1594,7 +1553,6 @@
         }
     };
 
-    // Toast helper
     function showToast(message, type) {
         const existing = document.getElementById('appToast');
         if (existing) existing.remove();
@@ -1611,39 +1569,6 @@
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 2600);
-    }
-
-    async function handleDownload(type, item, btnEl) {
-        const statusEl = document.getElementById('dlStatus');
-        if (!item.download_url) { if (statusEl) statusEl.innerText = 'Download URL missing.'; return; }
-        
-        const ps = getPointSettings();
-        const isLoggedIn = !!currentUser;
-        const isOwnFile = isLoggedIn && item.uploadedBy === currentUser.uid;
-        const isPrompt = type === 'prompt' || item.isPromptUpload;
-
-        if (isLoggedIn && !isOwnFile) {
-            const cost = isPrompt ? ps.promptDownloadReward : ps.downloadReward;
-            if (cost > 0) {
-                const curBal = (currentUserData && currentUserData.balance) || 0;
-                if (curBal < cost) {
-                    if (statusEl) statusEl.innerHTML = '❌ পয়েন্ট যথেষ্ট নয়। প্রয়োজন: ' + cost + ' পয়েন্ট। বর্তমান: ' + curBal;
-                    return;
-                }
-                const ok = await deductPointsFromUser(currentUser.uid, cost, 'download:' + item.id);
-                if (!ok) { if (statusEl) statusEl.innerText = '❌ পয়েন্ট কাটা যায়নি'; return; }
-                currentUserData.balance = curBal - cost;
-            }
-        }
-
-        if (item.uploadedBy && isLoggedIn && !isOwnFile && ps.uploaderEarnsOnDownload) {
-            const reward = isPrompt ? ps.promptUploaderReward : ps.uploaderReward;
-            if (reward > 0) await addPointsToUser(item.uploadedBy, reward, 'download_by:' + currentUser.uid + ':' + item.id);
-        }
-
-        if (btnEl) { btnEl.innerText = 'Redirecting...'; btnEl.disabled = true; }
-        await filesRef.child(item.id).child('total_downloads').transaction(c => (c || 0) + 1);
-        window.location.href = item.download_url;
     }
 
     // ==================== AD SYSTEM ====================
@@ -1716,23 +1641,51 @@
         }, 500);
     };
 
+    // ⭐ COMPLETE AD UNLOCK — with prompt transaction
     async function completeAdUnlock() {
         if (adUnlockCompleted) return;
         adUnlockCompleted = true;
         if (!pendingAdFileId) return;
-        clearInterval(adTimerInterval); clearInterval(adCheckInterval);
+        
+        clearInterval(adTimerInterval); 
+        clearInterval(adCheckInterval);
         adPopupBtn.disabled = true;
-        adPopupBtn.innerHTML = '<i class="fas fa-check-circle"></i> Unlocked!';
-        const newWatched = pendingAdCurrentWatched + 1;
+        adPopupBtn.innerHTML = '<i class="fas fa-check-circle"></i> Unlocking...';
+        
         try {
+            const newWatched = pendingAdCurrentWatched + 1;
+            
+            // Save watched count
             if (currentUser) {
                 await database.ref('user_file_status/' + currentUser.uid + '_' + pendingAdFileId).set(newWatched);
                 await usersRef.child(currentUser.uid).child('adsWatched').transaction(c => (c || 0) + 1);
             } else {
                 localStorage.setItem('ad_' + pendingAdFileId, newWatched);
             }
-        } catch(e) { console.error(e); }
-        setTimeout(() => { closeAdPopup(); handleRoute(); }, 1200);
+            
+            const allDone = newWatched >= pendingAdReq;
+            
+            if (allDone && pendingAdType === 'prompt') {
+                // ⭐ PROMPT FULLY UNLOCKED → execute transaction
+                const aiPrompts = getAIPromptFiles();
+                const promptItem = aiPrompts.find(p => p.id === pendingAdFileId);
+                
+                if (promptItem && currentUser) {
+                    await executePromptTransaction(promptItem);
+                }
+            } else if (allDone && pendingAdType === 'file') {
+                showToast('✅ সব Step সম্পূর্ণ! এখন Download করুন', 'success');
+            } else {
+                showToast('✅ Step ' + newWatched + '/' + pendingAdReq + ' সম্পূর্ণ!', 'success');
+            }
+            
+            adPopupBtn.innerHTML = '<i class="fas fa-check-circle"></i> Unlocked!';
+        } catch(e) {
+            console.error('completeAdUnlock:', e);
+            showToast('❌ ' + e.message, 'error');
+        }
+        
+        setTimeout(() => { closeAdPopup(); handleRoute(); }, 1400);
     }
 
     window.closeAdPopup = function() {
@@ -1875,7 +1828,7 @@
                 }
                 const el = document.getElementById('uploadAlert');
                 el.className = 'alert alert-success';
-                el.innerText = '✅ Prompt uploaded! ' + reward + ' পয়েন্ট যোগ হয়েছে। এডমিন approve করলে সাইটে দেখা যাবে।';
+                el.innerText = '✅ Prompt uploaded! ' + reward + ' পয়েন্ট যোগ হয়েছে।';
                 document.getElementById('uploadPromptForm').reset();
                 setTimeout(() => navigateTo('/profile'), 2000);
             } catch(err) {
@@ -2051,15 +2004,12 @@
 
     // ==================== INIT ====================
     currentRoute = window.location.hash.substring(1) || '/';
-    // Show skeleton IMMEDIATELY
     renderHomeSkeleton();
-    // Then load real content
     setTimeout(() => { 
         if (!app.innerHTML.trim() || app.innerHTML.includes('skeleton')) {
             handleRoute();
         }
     }, 50);
-    // Start loading data immediately in background
     loadData();
 </script>
 </body>
