@@ -1,0 +1,9 @@
+{
+  "name": "filehub",
+  "version": "1.0.0",
+  "description": "FileHub - Secure File Sharing Platform",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
