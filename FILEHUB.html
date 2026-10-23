@@ -36,9 +36,8 @@
             --border: #e2e8f0;
             --sidebar-w: 260px;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
         }
         [data-theme="dark"] {
             --primary: #818cf8;
@@ -61,9 +60,8 @@
             --text-light: #64748b;
             --border: #334155;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-            --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+            --shadow: 0 1px 3px rgba(0,0,0,0.4);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
         }
         html, body { margin: 0; padding: 0; height: 100%; }
         body {
@@ -91,22 +89,18 @@
         #login-screen::before {
             content: '';
             position: absolute;
-            width: 500px;
-            height: 500px;
+            width: 500px; height: 500px;
             border-radius: 50%;
             background: rgba(255,255,255,0.08);
-            top: -200px;
-            right: -100px;
+            top: -200px; right: -100px;
         }
         #login-screen::after {
             content: '';
             position: absolute;
-            width: 300px;
-            height: 300px;
+            width: 300px; height: 300px;
             border-radius: 50%;
             background: rgba(255,255,255,0.06);
-            bottom: -100px;
-            left: -100px;
+            bottom: -100px; left: -100px;
         }
         .login-card {
             background: var(--surface);
@@ -117,15 +111,9 @@
             box-shadow: 0 25px 60px rgba(0,0,0,0.3);
             position: relative;
             z-index: 1;
-            animation: slideUp 0.6s ease;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .login-logo {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             border-radius: 20px;
             margin: 0 auto 20px;
             display: block;
@@ -136,7 +124,6 @@
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 6px;
-            color: var(--text);
         }
         .login-sub {
             text-align: center;
@@ -145,7 +132,7 @@
             font-size: 0.9rem;
         }
         
-        /* ============ FORM ELEMENTS ============ */
+        /* ============ FORMS ============ */
         .form-group { margin-bottom: 16px; }
         .form-label {
             display: block;
@@ -271,22 +258,13 @@
             color: #fff;
         }
         .sidebar-logo {
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             border-radius: 10px;
             object-fit: cover;
             background: #fff;
         }
-        .sidebar-brand-text h1 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        .sidebar-brand-text p {
-            font-size: 0.72rem;
-            margin: 0;
-            opacity: 0.85;
-        }
+        .sidebar-brand-text h1 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+        .sidebar-brand-text p { font-size: 0.72rem; margin: 0; opacity: 0.85; }
         
         .nav-section {
             font-size: 0.7rem;
@@ -309,7 +287,6 @@
             cursor: pointer;
             transition: all 0.15s;
             margin-bottom: 2px;
-            position: relative;
         }
         .nav-link i { width: 20px; text-align: center; font-size: 1rem; }
         .nav-link:hover { background: var(--surface-2); color: var(--text); }
@@ -351,7 +328,6 @@
             top: 0;
             z-index: 50;
         }
-        @media (min-width: 1024px) { .mobile-header { display: none; } }
         .mobile-header button {
             background: none;
             border: none;
@@ -373,7 +349,6 @@
         .page-title {
             font-size: 1.7rem;
             font-weight: 700;
-            color: var(--text);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -401,7 +376,6 @@
         .card-title {
             font-size: 1.1rem;
             font-weight: 700;
-            color: var(--text);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -415,7 +389,6 @@
             gap: 12px;
             margin-bottom: 20px;
         }
-        @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
         @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
         
         .stat-card {
@@ -424,24 +397,11 @@
             padding: 16px;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
-            position: relative;
-            overflow: hidden;
             transition: all 0.25s;
         }
         .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            background: var(--primary-light);
-            opacity: 0.5;
-            transform: translate(30%, -30%);
-        }
         .stat-icon {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -449,92 +409,22 @@
             font-size: 1.2rem;
             color: #fff;
             margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
         }
         .stat-card.c-primary .stat-icon { background: linear-gradient(135deg, #6366f1, #4f46e5); }
         .stat-card.c-success .stat-icon { background: linear-gradient(135deg, #10b981, #059669); }
         .stat-card.c-warning .stat-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .stat-card.c-danger .stat-icon { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .stat-card.c-info .stat-icon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .stat-card.c-purple .stat-icon { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-        .stat-card.c-pink .stat-icon { background: linear-gradient(135deg, #ec4899, #db2777); }
-        .stat-card.c-teal .stat-icon { background: linear-gradient(135deg, #14b8a6, #0d9488); }
-        
         .stat-value {
             font-size: 1.6rem;
             font-weight: 800;
-            color: var(--text);
             line-height: 1.1;
             margin-bottom: 4px;
             font-family: 'Outfit', sans-serif;
         }
-        @media (min-width: 1024px) { .stat-value { font-size: 1.9rem; } }
         .stat-label {
             font-size: 0.78rem;
             color: var(--text-sub);
             font-weight: 500;
-        }
-        .stat-trend {
-            font-size: 0.72rem;
-            margin-top: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 600;
-        }
-        .stat-trend.up { color: var(--success); }
-        .stat-trend.down { color: var(--danger); }
-        
-        /* ============ DASHBOARD GRID ============ */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        @media (min-width: 1024px) {
-            .dashboard-grid { grid-template-columns: 1fr 1fr; }
-            .dashboard-grid .span-2 { grid-column: span 2; }
-        }
-        
-        /* ============ ACTIVITY LIST ============ */
-        .activity-list { list-style: none; padding: 0; margin: 0; }
-        .activity-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: var(--primary-light);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.95rem;
-            flex-shrink: 0;
-        }
-        .activity-icon.success { background: var(--success-light); color: var(--success); }
-        .activity-icon.warning { background: var(--warning-light); color: var(--warning); }
-        .activity-icon.danger { background: var(--danger-light); color: var(--danger); }
-        .activity-info { flex: 1; min-width: 0; }
-        .activity-title {
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--text);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .activity-meta {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            margin-top: 2px;
         }
         
         /* ============ TABLE ============ */
@@ -556,18 +446,14 @@
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
-        .data-table thead th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-        .data-table thead th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
         .data-table tbody td {
             padding: 12px;
             border-bottom: 1px solid var(--border);
             vertical-align: middle;
         }
         .data-table tbody tr:hover { background: var(--surface-2); }
-        .data-table tbody tr:last-child td { border-bottom: none; }
         .cell-title {
             font-weight: 600;
-            color: var(--text);
             max-width: 250px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -614,10 +500,8 @@
             align-items: center;
             justify-content: center;
             padding: 15px;
-            animation: fadeIn 0.2s;
         }
         .modal-overlay.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .modal-box {
             background: var(--surface);
             border-radius: 20px;
@@ -627,7 +511,6 @@
             overflow-y: auto;
             box-shadow: 0 25px 60px rgba(0,0,0,0.4);
             position: relative;
-            animation: slideUp 0.3s ease;
         }
         .modal-header {
             padding: 20px 24px;
@@ -641,16 +524,11 @@
             z-index: 1;
             border-radius: 20px 20px 0 0;
         }
-        .modal-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text);
-        }
+        .modal-title { font-size: 1.2rem; font-weight: 700; }
         .modal-close {
             background: var(--surface-2);
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -658,7 +536,6 @@
             cursor: pointer;
             color: var(--text-sub);
             font-size: 1rem;
-            transition: all 0.2s;
         }
         .modal-close:hover { background: var(--danger-light); color: var(--danger); }
         .modal-body { padding: 20px 24px; }
@@ -695,8 +572,7 @@
         @media (min-width: 1024px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
         
         .thumb-img {
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
             border-radius: 10px;
             object-fit: cover;
             border: 1.5px solid var(--border);
@@ -711,8 +587,7 @@
             margin-bottom: 8px;
         }
         .method-card img {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 8px;
             object-fit: cover;
         }
@@ -727,74 +602,46 @@
             font-size: 0.75rem;
             font-weight: 700;
         }
-        .slug-preview {
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-family: monospace;
-            font-size: 0.78rem;
-            color: var(--primary);
-            word-break: break-all;
-            margin-top: 6px;
+        .points-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 14px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 12px;
+            margin: 12px 0;
+            border: 1.5px dashed #f59e0b;
         }
-        .slug-input-wrap {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--surface-2);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            padding: 0 12px;
+        [data-theme="dark"] .points-input-group {
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.1));
         }
-        .slug-input-wrap:focus-within { border-color: var(--primary); }
-        .slug-input-wrap .prefix { color: var(--text-sub); font-family: monospace; font-size: 0.82rem; }
-        .slug-input-wrap input {
-            border: none;
-            background: transparent;
-            padding: 11px 0;
-            outline: none;
-            width: 100%;
-            color: var(--text);
-            font-family: monospace;
-            font-size: 0.88rem;
+        .points-input-group .form-label {
+            color: #92400e;
         }
-        .social-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--surface-2);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            padding: 0 12px;
+        [data-theme="dark"] .points-input-group .form-label {
+            color: #fbbf24;
+        }
+        
+        .password-reset-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 12px 0;
+            border: 1.5px dashed #f59e0b;
+        }
+        [data-theme="dark"] .password-reset-box {
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.1));
+        }
+        .password-reset-box .box-title {
+            font-weight: 700;
+            color: #92400e;
             margin-bottom: 10px;
-        }
-        .social-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 0.85rem;
-            flex-shrink: 0;
+            gap: 8px;
         }
-        .social-icon.telegram { background: #0088cc; }
-        .social-icon.facebook { background: #1877f2; }
-        .social-icon.youtube { background: #ff0000; }
-        .social-icon.whatsapp { background: #25d366; }
-        .social-icon.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-        .social-icon.twitter { background: #000; }
-        .social-icon.email { background: #ea4335; }
-        .social-row input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 11px 0;
-            outline: none;
-            color: var(--text);
-            font-size: 0.85rem;
+        [data-theme="dark"] .password-reset-box .box-title {
+            color: #fbbf24;
         }
         
         .empty-state {
@@ -809,32 +656,13 @@
             display: block;
         }
         
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
         
-        /* Progress bars */
-        .progress {
-            height: 8px;
-            background: var(--surface-2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        
-        /* Loading spinner */
         .spinner {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            width: 14px; height: 14px;
             border: 2px solid currentColor;
             border-top-color: transparent;
             border-radius: 50%;
@@ -845,7 +673,7 @@
 </head>
 <body>
 
-<!-- ============ LOGIN SCREEN ============ -->
+<!-- LOGIN -->
 <div id="login-screen">
     <div class="login-card">
         <img src="https://iili.io/fY4mez7.jpg" alt="FileHub" class="login-logo">
@@ -868,7 +696,7 @@
     </div>
 </div>
 
-<!-- ============ ADMIN SCREEN ============ -->
+<!-- ADMIN PANEL -->
 <div id="admin-screen">
     <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     
@@ -879,9 +707,6 @@
                 <h1>FileHub</h1>
                 <p>Admin Panel</p>
             </div>
-            <button style="margin-left: auto; background: none; border: none; color: #fff; font-size: 1rem; cursor: pointer; display: none;" class="sidebar-close-btn" onclick="toggleSidebar()">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
         
         <div class="nav-section">Overview</div>
@@ -936,7 +761,6 @@
         </div>
         
         <div style="flex: 1;"></div>
-        
         <div class="nav-link" style="color: var(--danger); margin-top: 8px; border-top: 1px solid var(--border); padding-top: 14px;" onclick="logout()">
             <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
         </div>
@@ -952,7 +776,7 @@
     </main>
 </div>
 
-<!-- ============ MODAL ============ -->
+<!-- MODALS -->
 <div id="item-modal" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
@@ -991,7 +815,6 @@
         messagingSenderId: "425635065125",
         appId: "1:425635065125:web:a8ce55b1745f301bb5becc",
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
@@ -1013,7 +836,6 @@
     let allBanners = [];
     let allWithdrawals = [];
     let appSettings = {};
-    let editingItemId = null;
 
     // ==================== THEME ====================
     function initTheme() {
@@ -1039,11 +861,9 @@
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             try {
-                // Check if admin exists
                 const adminSnap = await adminsRef.once('value');
                 const admins = adminSnap.val() || {};
                 
-                // If no admins exist yet, make the first user an admin
                 if (Object.keys(admins).length === 0) {
                     await adminsRef.child(user.uid).set({ 
                         email: user.email, 
@@ -1053,7 +873,6 @@
                     console.log('✅ First admin auto-created');
                 }
                 
-                // Check if current user is admin
                 const userAdminSnap = await adminsRef.child(user.uid).once('value');
                 if (userAdminSnap.exists()) {
                     currentUser = user;
@@ -1066,7 +885,6 @@
                 }
             } catch (error) {
                 console.error('Admin check error:', error);
-                // Fallback: allow login even if check fails
                 currentUser = user;
                 showAdminScreen();
                 await loadAllData();
@@ -1085,13 +903,11 @@
         btn.innerHTML = '<span class="spinner"></span> Signing in...';
         try {
             await auth.signInWithEmailAndPassword(email, password);
-            // onAuthStateChanged will handle the rest
         } catch (error) {
             let msg = error.message;
             if (msg.includes('user-not-found')) msg = 'এই ইমেইলে কোনো অ্যাকাউন্ট নেই।';
             else if (msg.includes('wrong-password')) msg = 'পাসওয়ার্ড ভুল।';
             else if (msg.includes('invalid-email')) msg = 'ইমেইল ভুল।';
-            else if (msg.includes('too-many-requests')) msg = 'অনেকবার চেষ্টা করেছেন, কিছুক্ষণ পর আবার চেষ্টা করুন।';
             showLoginAlert(msg, 'error');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
@@ -1112,22 +928,81 @@
     function showAdminScreen() {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-screen').classList.add('active');
-        if (window.innerWidth < 1024) {
-            document.querySelector('.sidebar-close-btn').style.display = 'block';
-        }
     }
-
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebar-overlay').classList.toggle('active');
     }
-
     async function logout() {
         await auth.signOut();
         window.location.reload();
     }
 
-    // ==================== DATA LOADING ====================
+    // ==================== HELPERS ====================
+    function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+    function formatCount(n) {
+        if (!n) return '0';
+        if (n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+        if (n >= 1e3) return (n/1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+        return n;
+    }
+    function timeAgo(ts) {
+        if (!ts) return 'N/A';
+        const s = Math.floor((Date.now() - ts) / 1000);
+        if (s < 60) return 'just now';
+        if (s < 3600) return Math.floor(s / 60) + 'm ago';
+        if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+        if (s < 2592000) return Math.floor(s / 86400) + 'd ago';
+        return Math.floor(s / 2592000) + 'mo ago';
+    }
+    function getPointSettings() {
+        const p = appSettings.points || {};
+        return {
+            uploadReward: p.uploadReward ?? 10,
+            downloadReward: p.downloadReward ?? 0,
+            uploaderReward: p.uploaderReward ?? 5,
+            uploaderEarnsOnDownload: p.uploaderEarnsOnDownload !== false,
+            promptUploadReward: p.promptUploadReward ?? 15,
+            promptDownloadReward: p.promptDownloadReward ?? 0,
+            promptUploaderReward: p.promptUploaderReward ?? 8
+        };
+    }
+    function getWithdrawSettings() {
+        const w = appSettings.withdraw || {};
+        return {
+            pointToTaka: w.pointToTaka ?? 100,
+            minWithdraw: w.minWithdraw ?? 500,
+            methods: w.methods || {}
+        };
+    }
+    function showAlert(id, msg, type = 'success') {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const icons = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle', warning: 'exclamation-triangle' };
+        el.className = 'alert alert-' + type;
+        el.innerHTML = '<i class="fas fa-' + (icons[type] || 'info-circle') + '"></i> ' + msg;
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+    function openModal() { document.getElementById('item-modal').classList.add('active'); }
+    function closeModal() {
+        document.getElementById('item-modal').classList.remove('active');
+        document.getElementById('modal-alert').classList.add('hidden');
+    }
+    function openConfirmModal(msg, onConfirm) {
+        document.getElementById('confirm-message').textContent = msg;
+        document.getElementById('confirm-modal').classList.add('active');
+        document.getElementById('confirm-action').onclick = async () => {
+            try { await onConfirm(); } catch (e) { console.error(e); alert('Failed: ' + e.message); }
+            closeConfirmModal();
+        };
+    }
+    function closeConfirmModal() { document.getElementById('confirm-modal').classList.remove('active'); }
+
+    // ==================== DATA ====================
     async function loadAllData() {
         try {
             const [usersSnap, filesSnap, bannersSnap, settingsSnap, wdSnap] = await Promise.all([
@@ -1208,73 +1083,6 @@
         window.scrollTo(0, 0);
     }
 
-    // ==================== HELPERS ====================
-    function esc(s) {
-        if (!s) return '';
-        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-    }
-    function formatCount(n) {
-        if (!n) return '0';
-        if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
-        if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
-        return n;
-    }
-    function timeAgo(ts) {
-        if (!ts) return 'N/A';
-        const s = Math.floor((Date.now() - ts) / 1000);
-        if (s < 60) return 'just now';
-        if (s < 3600) return Math.floor(s / 60) + 'm ago';
-        if (s < 86400) return Math.floor(s / 3600) + 'h ago';
-        if (s < 2592000) return Math.floor(s / 86400) + 'd ago';
-        return Math.floor(s / 2592000) + 'mo ago';
-    }
-    function getPointSettings() {
-        const p = appSettings.points || {};
-        return {
-            uploadReward: p.uploadReward ?? 10,
-            downloadReward: p.downloadReward ?? 2,
-            uploaderReward: p.uploaderReward ?? 5,
-            uploaderEarnsOnDownload: p.uploaderEarnsOnDownload !== false,
-            promptUploadReward: p.promptUploadReward ?? 15,
-            promptDownloadReward: p.promptDownloadReward ?? 3,
-            promptUploaderReward: p.promptUploaderReward ?? 8
-        };
-    }
-    function getWithdrawSettings() {
-        const w = appSettings.withdraw || {};
-        return {
-            pointToTaka: w.pointToTaka ?? 100,
-            minWithdraw: w.minWithdraw ?? 500,
-            methods: w.methods || {}
-        };
-    }
-
-    function showAlert(id, msg, type = 'success') {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const icons = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle', warning: 'exclamation-triangle' };
-        el.className = 'alert alert-' + type;
-        el.innerHTML = '<i class="fas fa-' + (icons[type] || 'info-circle') + '"></i> ' + msg;
-        el.classList.remove('hidden');
-        setTimeout(() => el.classList.add('hidden'), 4000);
-    }
-
-    function openModal() { document.getElementById('item-modal').classList.add('active'); }
-    function closeModal() {
-        document.getElementById('item-modal').classList.remove('active');
-        document.getElementById('modal-alert').classList.add('hidden');
-        editingItemId = null;
-    }
-    function openConfirmModal(msg, onConfirm) {
-        document.getElementById('confirm-message').textContent = msg;
-        document.getElementById('confirm-modal').classList.add('active');
-        document.getElementById('confirm-action').onclick = async () => {
-            try { await onConfirm(); } catch (e) { console.error(e); alert('Failed: ' + e.message); }
-            closeConfirmModal();
-        };
-    }
-    function closeConfirmModal() { document.getElementById('confirm-modal').classList.remove('active'); }
-
     // ==================== DASHBOARD ====================
     function renderDashboard() {
         const totalUsers = allUsers.length;
@@ -1285,28 +1093,10 @@
         const pendingWithdrawals = allWithdrawals.filter(w => w.status === 'pending').length;
         const pendingPrompts = allFiles.filter(f => f.isPromptUpload && f.status === 'pending').length;
         const activeUsers = allUsers.filter(u => u.isAccountActive !== false).length;
-        
-        // Recent activities (last 5 files + withdrawals combined)
-        const activities = [
-            ...allFiles.slice(0, 5).map(f => ({
-                icon: f.isPromptUpload ? 'fa-magic' : (f.file_extension === '.apk' ? 'fa-android' : 'fa-file'),
-                cls: f.status === 'pending' ? 'warning' : f.status === 'approved' ? 'success' : 'danger',
-                title: f.title || 'Untitled',
-                meta: `${f.isPromptUpload ? 'Prompt' : 'File'} • ${f.uploadedByEmail ? f.uploadedByEmail.split('@')[0] : 'User'} • ${timeAgo(f.created_at)}`
-            })),
-            ...allWithdrawals.slice(0, 3).map(w => ({
-                icon: 'fa-money-bill-wave',
-                cls: w.status === 'pending' ? 'warning' : w.status === 'approved' ? 'success' : 'danger',
-                title: `${w.amount} pts (${(w.taka || 0).toFixed(2)}৳)`,
-                meta: `Withdraw • ${w.username || 'User'} • ${timeAgo(w.createdAt)}`
-            }))
-        ].sort((a, b) => (b.time || 0) - (a.time || 0)).slice(0, 8);
 
         document.getElementById('page-content').innerHTML = `
             <div class="page-header">
-                <h1 class="page-title">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </h1>
+                <h1 class="page-title"><i class="fas fa-chart-line"></i> Dashboard</h1>
                 <button class="btn btn-primary btn-sm" onclick="loadAllData()">
                     <i class="fas fa-redo"></i> Refresh
                 </button>
@@ -1317,24 +1107,21 @@
                     <div class="stat-icon"><i class="fas fa-users"></i></div>
                     <div class="stat-value">${totalUsers}</div>
                     <div class="stat-label">Total Users</div>
-                    <div class="stat-trend up"><i class="fas fa-circle-check"></i> ${activeUsers} active</div>
                 </div>
                 <div class="stat-card c-info">
                     <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
                     <div class="stat-value">${totalFiles + totalPrompts}</div>
                     <div class="stat-label">Total Items</div>
-                    <div class="stat-trend"><i class="fas fa-file"></i> ${totalFiles} files • <i class="fas fa-magic"></i> ${totalPrompts} prompts</div>
                 </div>
                 <div class="stat-card c-success">
                     <div class="stat-icon"><i class="fas fa-coins"></i></div>
                     <div class="stat-value">${formatCount(totalPoints)}</div>
                     <div class="stat-label">Total Points</div>
-                    <div class="stat-trend up"><i class="fas fa-arrow-up"></i> ${(totalPoints / 100).toFixed(0)}৳ worth</div>
                 </div>
                 <div class="stat-card c-danger">
                     <div class="stat-icon"><i class="fas fa-download"></i></div>
                     <div class="stat-value">${formatCount(totalDownloads)}</div>
-                    <div class="stat-label">Total Downloads</div>
+                    <div class="stat-label">Downloads</div>
                 </div>
             </div>
             
@@ -1343,90 +1130,50 @@
                     <div class="stat-icon"><i class="fas fa-clock"></i></div>
                     <div class="stat-value">${pendingPrompts}</div>
                     <div class="stat-label">Pending Prompts</div>
-                    ${pendingPrompts > 0 ? `<div class="stat-trend down"><i class="fas fa-exclamation"></i> Needs review</div>` : ''}
                 </div>
-                <div class="stat-card c-purple">
+                <div class="stat-card c-primary">
                     <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
                     <div class="stat-value">${pendingWithdrawals}</div>
                     <div class="stat-label">Pending Withdrawals</div>
-                    ${pendingWithdrawals > 0 ? `<div class="stat-trend down"><i class="fas fa-exclamation"></i> Needs review</div>` : ''}
                 </div>
-                <div class="stat-card c-pink">
+                <div class="stat-card c-success">
+                    <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+                    <div class="stat-value">${activeUsers}</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card c-warning">
                     <div class="stat-icon"><i class="fas fa-image"></i></div>
                     <div class="stat-value">${allBanners.length}</div>
                     <div class="stat-label">Banners</div>
                 </div>
-                <div class="stat-card c-teal">
-                    <div class="stat-icon"><i class="fas fa-robot"></i></div>
-                    <div class="stat-value">${(appSettings.aiImage && appSettings.aiImage.prompts ? appSettings.aiImage.prompts.length : 0)}</div>
-                    <div class="stat-label">Admin Prompts</div>
-                </div>
             </div>
             
-            <div class="dashboard-grid">
-                <div class="card span-2">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
-                    </div>
-                    <div class="grid-3">
-                        <button class="btn btn-outline" style="justify-content: flex-start; padding: 16px;" onclick="openFileForm()">
-                            <i class="fas fa-upload" style="color: var(--primary); font-size: 1.4rem; margin-right: 8px;"></i>
-                            <div style="text-align: left;">
-                                <div style="font-weight: 700;">Upload File</div>
-                                <div style="font-size: 0.75rem; color: var(--text-sub);">Add new file</div>
-                            </div>
-                        </button>
-                        <button class="btn btn-outline" style="justify-content: flex-start; padding: 16px;" onclick="loadPage('prompt-uploads')">
-                            <i class="fas fa-magic" style="color: #8b5cf6; font-size: 1.4rem; margin-right: 8px;"></i>
-                            <div style="text-align: left;">
-                                <div style="font-weight: 700;">Review Prompts</div>
-                                <div style="font-size: 0.75rem; color: var(--text-sub);">${pendingPrompts} pending</div>
-                            </div>
-                        </button>
-                        <button class="btn btn-outline" style="justify-content: flex-start; padding: 16px;" onclick="loadPage('withdrawals')">
-                            <i class="fas fa-money-bill-wave" style="color: var(--warning); font-size: 1.4rem; margin-right: 8px;"></i>
-                            <div style="text-align: left;">
-                                <div style="font-weight: 700;">Withdrawals</div>
-                                <div style="font-size: 0.75rem; color: var(--text-sub);">${pendingWithdrawals} pending</div>
-                            </div>
-                        </button>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
                 </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-clock-rotate-left"></i> Recent Activity</h3>
-                    </div>
-                    <ul class="activity-list">
-                        ${activities.length === 0 ? '<li class="empty-state" style="padding: 20px;"><i class="fas fa-inbox"></i><p>No activity yet</p></li>' :
-                        activities.map(a => `
-                            <li class="activity-item">
-                                <div class="activity-icon ${a.cls}"><i class="fas ${a.icon}"></i></div>
-                                <div class="activity-info">
-                                    <div class="activity-title">${esc(a.title)}</div>
-                                    <div class="activity-meta">${esc(a.meta)}</div>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-fire"></i> Top Downloads</h3>
-                    </div>
-                    <ul class="activity-list">
-                        ${allFiles.length === 0 ? '<li class="empty-state" style="padding: 20px;"><i class="fas fa-inbox"></i><p>No files yet</p></li>' :
-                        allFiles.sort((a, b) => (b.total_downloads || 0) - (a.total_downloads || 0)).slice(0, 5).map(f => `
-                            <li class="activity-item">
-                                <div class="activity-icon success"><i class="fas fa-download"></i></div>
-                                <div class="activity-info">
-                                    <div class="activity-title">${esc(f.title || 'Untitled')}</div>
-                                    <div class="activity-meta">${f.total_downloads || 0} downloads</div>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>
+                <div class="grid-3">
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 16px;" onclick="openFileForm()">
+                        <i class="fas fa-upload" style="color: var(--primary); font-size: 1.4rem; margin-right: 8px;"></i>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700;">Upload File</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub);">Add new file</div>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 16px;" onclick="loadPage('prompt-uploads')">
+                        <i class="fas fa-magic" style="color: #8b5cf6; font-size: 1.4rem; margin-right: 8px;"></i>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700;">Review Prompts</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub);">${pendingPrompts} pending</div>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 16px;" onclick="loadPage('withdrawals')">
+                        <i class="fas fa-money-bill-wave" style="color: var(--warning); font-size: 1.4rem; margin-right: 8px;"></i>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700;">Withdrawals</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub);">${pendingWithdrawals} pending</div>
+                        </div>
+                    </button>
                 </div>
             </div>
         `;
@@ -1438,43 +1185,54 @@
         
         document.getElementById('page-content').innerHTML = `
             <div class="page-header">
-                <h1 class="page-title"><i class="fas fa-file-alt"></i> Manage Files</h1>
+                <h1 class="page-title"><i class="fas fa-file-alt"></i> Files</h1>
                 <button class="btn btn-primary" onclick="openFileForm()">
                     <i class="fas fa-plus"></i> Add File
                 </button>
             </div>
             
+            <div class="info-banner">
+                <i class="fas fa-info-circle"></i>
+                <span>প্রতিটি ফাইলে আলাদা পয়েন্ট সেট করা যাবে। Approve করলে আপলোডার পয়েন্ট পাবে।</span>
+            </div>
+            
             <div class="card">
                 ${files.length === 0 ? 
-                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>No files yet. Click "Add File" to create one.</p></div>` :
+                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>No files yet.</p></div>` :
                     `<div class="table-wrap">
                         <table class="data-table">
                             <thead><tr>
                                 <th>Preview</th>
                                 <th>Title</th>
                                 <th>Status</th>
-                                <th>Ads</th>
+                                <th>Upload Pts</th>
+                                <th>Uploader Pts</th>
                                 <th>Downloads</th>
                                 <th>Actions</th>
                             </tr></thead>
                             <tbody>
-                                ${files.map(f => `
+                                ${files.map(f => {
+                                    const ps = getPointSettings();
+                                    const uploadPts = f.uploadPoints !== undefined && f.uploadPoints !== null ? f.uploadPoints : ps.uploadReward;
+                                    const uploaderPts = f.uploaderPoints !== undefined && f.uploaderPoints !== null ? f.uploaderPoints : ps.uploaderReward;
+                                    return `
                                     <tr>
                                         <td><img src="${esc(f.thumbnail_url || '')}" class="thumb-img" onerror="this.src='https://i.postimg.cc/VkCqsjD1/file-00000000fa18821191576f156d4e3bfe.png'"></td>
                                         <td><div class="cell-title">${esc(f.title || 'Untitled')}</div><div class="cell-muted">/file/${f.id}</div></td>
                                         <td><span class="badge badge-${f.status === 'approved' ? 'success' : f.status === 'pending' ? 'warning' : 'danger'}">${f.status || 'pending'}</span></td>
-                                        <td><span class="badge badge-primary"><i class="fas fa-play-circle"></i> ${f.required_ads || 0}</span></td>
+                                        <td><span class="badge badge-info">+${uploadPts}</span></td>
+                                        <td><span class="badge badge-primary">+${uploaderPts}</span></td>
                                         <td>${formatCount(f.total_downloads || 0)}</td>
                                         <td>
                                             <div class="cell-actions">
-                                                <a href="${esc(f.download_url)}" target="_blank" class="btn btn-primary btn-sm btn-icon" title="View"><i class="fas fa-external-link-alt"></i></a>
                                                 ${f.status === 'pending' ? `<button class="btn btn-success btn-sm btn-icon" onclick="quickApprove('${f.id}')" title="Approve"><i class="fas fa-check"></i></button>` : ''}
                                                 <button class="btn btn-warning btn-sm btn-icon" onclick="editFile('${f.id}')" title="Edit"><i class="fas fa-edit"></i></button>
                                                 <button class="btn btn-danger btn-sm btn-icon" onclick="deleteFile('${f.id}', '${esc(f.title || '').replace(/'/g, "\\'")}')" title="Delete"><i class="fas fa-trash"></i></button>
                                             </div>
                                         </td>
                                     </tr>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>`
@@ -1483,25 +1241,63 @@
         `;
     }
 
+    // ⭐ Approve with points
     async function quickApprove(fileId) {
-        await filesRef.child(fileId).update({ status: 'approved' });
         const file = allFiles.find(f => f.id === fileId);
-        if (file && file.uploadedBy) {
-            await notificationsRef.push({
-                title: '✅ File Approved',
-                decs: `Your file "${file.title}" has been approved!`,
-                target_uid: file.uploadedBy,
-                is_read: false,
-                created_at: Date.now()
+        if (!file) return;
+        
+        if (file.status === 'approved') { alert('Already approved'); return; }
+        
+        try {
+            await filesRef.child(fileId).update({ 
+                status: 'approved',
+                approvedAt: Date.now(),
+                approvedBy: currentUser.uid
             });
+            
+            const ps = getPointSettings();
+            const isPrompt = file.isPromptUpload === true;
+            
+            let reward;
+            if (file.uploadPoints !== undefined && file.uploadPoints !== null && file.uploadPoints !== '') {
+                reward = Number(file.uploadPoints);
+            } else {
+                reward = isPrompt ? ps.promptUploadReward : ps.uploadReward;
+            }
+            
+            if (file.uploadedBy && file.uploadedBy !== 'admin' && reward > 0) {
+                await usersRef.child(file.uploadedBy).child('balance').transaction(c => (c || 0) + reward);
+                await pointLogsRef.child(file.uploadedBy).push({
+                    amount: reward,
+                    reason: 'upload_approved:' + fileId + ':' + (file.title || ''),
+                    timestamp: Date.now()
+                });
+            }
+            
+            await filesRef.child(fileId).update({ pointsAwarded: true });
+            
+            if (file.uploadedBy) {
+                await notificationsRef.push({
+                    title: '✅ File Approved',
+                    decs: 'Your file "' + (file.title || '') + '" has been approved!' + (reward > 0 ? ' আপনি +' + reward + ' পয়েন্ট পেয়েছেন!' : ''),
+                    target_uid: file.uploadedBy,
+                    is_read: false,
+                    created_at: Date.now()
+                });
+            }
+            
+            await loadAllData();
+        } catch(e) {
+            console.error(e);
+            alert('Error: ' + e.message);
         }
-        await loadAllData();
     }
 
+    // ==================== FILE FORM ====================
     function openFileForm(fileId) {
-        editingItemId = fileId || null;
         const file = fileId ? allFiles.find(f => f.id === fileId) : {};
-        document.getElementById('modal-title').innerHTML = fileId ? '✏️ Edit File' : '➕ Add New File';
+        const ps = getPointSettings();
+        document.getElementById('modal-title').innerHTML = fileId ? '✏️ Edit File' : '➕ Add File';
         
         const detailPhotos = (file.detail_photos || []).join('\n');
         const existingSlug = fileId && !file.id.startsWith('-') ? file.id : '';
@@ -1510,15 +1306,6 @@
             <div class="form-group">
                 <label class="form-label">Title *</label>
                 <input type="text" id="file-title" class="form-input" value="${esc(file.title || '')}" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Custom URL (Optional)</label>
-                <div class="slug-input-wrap">
-                    <span class="prefix">/file/</span>
-                    <input type="text" id="file-slug" value="${esc(existingSlug)}" placeholder="my-file-name">
-                </div>
-                <div class="slug-preview" id="slug-preview">${window.location.origin}/file/${existingSlug || 'auto-generated'}</div>
             </div>
             
             <div class="form-group">
@@ -1542,8 +1329,25 @@
                     <input type="text" id="file-extension" class="form-input" value="${esc(file.file_extension || '.zip')}">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Required Ads (Steps)</label>
+                    <label class="form-label">Required Ads</label>
                     <input type="number" id="file-required-ads" class="form-input" value="${file.required_ads || 0}" min="0">
+                </div>
+            </div>
+            
+            <!-- ⭐ POINTS SECTION -->
+            <div class="points-input-group">
+                <div style="grid-column: 1 / -1; font-weight: 700; color: #92400e; margin-bottom: 4px;">
+                    <i class="fas fa-coins"></i> Points Per Item (Optional Override)
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Upload Points (on approve)</label>
+                    <input type="number" id="file-upload-points" class="form-input" value="${file.uploadPoints !== undefined && file.uploadPoints !== null ? file.uploadPoints : ''}" min="0" placeholder="Default: ${ps.uploadReward}">
+                    <p style="font-size: 0.72rem; color: #92400e; margin-top: 4px;">ফাইল আপলোড করলে আপলোডার এই পয়েন্ট পাবে</p>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Uploader Points (on download)</label>
+                    <input type="number" id="file-uploader-points" class="form-input" value="${file.uploaderPoints !== undefined && file.uploaderPoints !== null ? file.uploaderPoints : ''}" min="0" placeholder="Default: ${ps.uploaderReward}">
+                    <p style="font-size: 0.72rem; color: #92400e; margin-top: 4px;">অন্য কেউ ডাউনলোড করলে আপলোডার এই পয়েন্ট পাবে</p>
                 </div>
             </div>
             
@@ -1560,33 +1364,52 @@
                     <option value="rejected" ${file.status === 'rejected' ? 'selected' : ''}>❌ Rejected</option>
                 </select>
             </div>
-            
-            <div class="modal-footer" style="padding: 16px 0 0; margin-top: 16px; border-top: 1px solid var(--border);">
-                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="save-file-btn">
-                    <i class="fas fa-save"></i> Save File
-                </button>
-            </div>
         `;
-        
-        // Auto-generate slug from title
-        document.getElementById('file-title').addEventListener('input', (e) => {
-            const slugInput = document.getElementById('file-slug');
-            if (!slugInput.dataset.manual) {
-                slugInput.value = generateSlug(e.target.value);
-                updateSlugPreview();
-            }
-        });
-        document.getElementById('file-slug').addEventListener('input', (e) => {
-            e.target.dataset.manual = 'true';
-            e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
-            updateSlugPreview();
-        });
-        
-        if (fileId) document.getElementById('file-slug').dataset.manual = 'true';
         
         document.getElementById('modal-form').onsubmit = (e) => saveFile(e, fileId);
         openModal();
+    }
+
+    async function saveFile(e, fileId) {
+        e.preventDefault();
+        const existing = fileId ? allFiles.find(f => f.id === fileId) : null;
+        const title = document.getElementById('file-title').value.trim();
+        
+        const uploadPts = document.getElementById('file-upload-points').value.trim();
+        const uploaderPts = document.getElementById('file-uploader-points').value.trim();
+        
+        const fileData = {
+            title,
+            description: document.getElementById('file-description').value,
+            thumbnail_url: document.getElementById('file-thumbnail').value,
+            download_url: document.getElementById('file-download-url').value,
+            file_extension: document.getElementById('file-extension').value,
+            required_ads: parseInt(document.getElementById('file-required-ads').value) || 0,
+            detail_photos: document.getElementById('file-detail-photos').value.split('\n').map(s => s.trim()).filter(Boolean),
+            status: document.getElementById('file-status').value,
+            created_at: existing ? existing.created_at : Date.now(),
+            total_downloads: existing ? (existing.total_downloads || 0) : 0,
+            uploadedBy: existing ? existing.uploadedBy : currentUser.uid,
+            uploadedByEmail: existing ? existing.uploadedByEmail : currentUser.email,
+            isPromptUpload: false,
+            uploadPoints: uploadPts === '' ? null : Number(uploadPts),
+            uploaderPoints: uploaderPts === '' ? null : Number(uploaderPts)
+        };
+        
+        try {
+            if (fileId) {
+                await filesRef.child(fileId).update(fileData);
+            } else {
+                const slug = generateSlug(title) || ('file-' + Date.now());
+                const snap = await filesRef.child(slug).once('value');
+                const finalSlug = snap.exists() ? slug + '-' + Date.now().toString().slice(-4) : slug;
+                await filesRef.child(finalSlug).set(fileData);
+            }
+            closeModal();
+            await loadAllData();
+        } catch (error) {
+            showAlert('modal-alert', error.message, 'error');
+        }
     }
 
     function generateSlug(title) {
@@ -1598,63 +1421,6 @@
             .replace(/^-|-$/g, '')
             .substring(0, 60);
     }
-    function updateSlugPreview() {
-        const val = document.getElementById('file-slug')?.value || 'auto-generated';
-        const preview = document.getElementById('slug-preview');
-        if (preview) preview.textContent = window.location.origin + '/file/' + val;
-    }
-
-    async function saveFile(e, fileId) {
-        e.preventDefault();
-        const btn = document.getElementById('save-file-btn');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Saving...';
-        
-        try {
-            const title = document.getElementById('file-title').value.trim();
-            const customSlug = document.getElementById('file-slug').value.trim();
-            let finalSlug = customSlug || generateSlug(title) || ('file-' + Date.now());
-            
-            const fileData = {
-                title,
-                description: document.getElementById('file-description').value,
-                thumbnail_url: document.getElementById('file-thumbnail').value,
-                download_url: document.getElementById('file-download-url').value,
-                file_extension: document.getElementById('file-extension').value,
-                required_ads: parseInt(document.getElementById('file-required-ads').value) || 0,
-                detail_photos: document.getElementById('file-detail-photos').value.split('\n').map(s => s.trim()).filter(Boolean),
-                status: document.getElementById('file-status').value,
-                created_at: fileId && allFiles.find(f => f.id === fileId) ? allFiles.find(f => f.id === fileId).created_at : Date.now(),
-                total_downloads: fileId && allFiles.find(f => f.id === fileId) ? (allFiles.find(f => f.id === fileId).total_downloads || 0) : 0,
-                uploadedBy: fileId && allFiles.find(f => f.id === fileId) ? allFiles.find(f => f.id === fileId).uploadedBy : currentUser.uid,
-                uploadedByEmail: fileId && allFiles.find(f => f.id === fileId) ? allFiles.find(f => f.id === fileId).uploadedByEmail : currentUser.email,
-                isPromptUpload: false
-            };
-            
-            const existing = fileId ? allFiles.find(f => f.id === fileId) : null;
-            
-            if (existing && existing.id !== finalSlug) {
-                // Check slug uniqueness
-                const snap = await filesRef.child(finalSlug).once('value');
-                if (snap.exists()) finalSlug = finalSlug + '-' + Date.now().toString().slice(-4);
-                await filesRef.child(finalSlug).set(fileData);
-                await filesRef.child(existing.id).remove();
-            } else if (existing) {
-                await filesRef.child(fileId).update(fileData);
-            } else {
-                const snap = await filesRef.child(finalSlug).once('value');
-                if (snap.exists()) finalSlug = finalSlug + '-' + Date.now().toString().slice(-4);
-                await filesRef.child(finalSlug).set(fileData);
-            }
-            
-            closeModal();
-            await loadAllData();
-        } catch (error) {
-            showAlert('modal-alert', error.message, 'error');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i> Save File';
-        }
-    }
 
     function editFile(id) { openFileForm(id); }
     function deleteFile(id, title) {
@@ -1664,11 +1430,12 @@
         });
     }
 
-    // ==================== PROMPT UPLOADS (User uploaded) ====================
+    // ==================== PROMPT UPLOADS ====================
     function renderPromptUploads() {
         const prompts = allFiles.filter(f => f.isPromptUpload === true);
         const pending = prompts.filter(p => p.status === 'pending').length;
         const approved = prompts.filter(p => p.status === 'approved').length;
+        const ps = getPointSettings();
         
         document.getElementById('page-content').innerHTML = `
             <div class="page-header">
@@ -1677,7 +1444,7 @@
             
             <div class="info-banner">
                 <i class="fas fa-info-circle"></i>
-                <span>ইউজারদের আপলোড করা প্রমোট। Approve করার আগে <strong>⚙️ Ad Steps</strong> সেট করুন।</span>
+                <span>ইউজার আপলোড করা প্রমোট। Approve করার আগে <strong>পয়েন্ট</strong> সেট করুন।</span>
             </div>
             
             <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
@@ -1707,12 +1474,16 @@
                                 <th>Preview</th>
                                 <th>Title</th>
                                 <th>Status</th>
-                                <th>Ads</th>
+                                <th>Upload Pts</th>
+                                <th>Uploader Pts</th>
                                 <th>Uploader</th>
                                 <th>Actions</th>
                             </tr></thead>
                             <tbody>
-                                ${prompts.map(f => `
+                                ${prompts.map(f => {
+                                    const uploadPts = f.uploadPoints !== undefined && f.uploadPoints !== null ? f.uploadPoints : ps.promptUploadReward;
+                                    const uploaderPts = f.uploaderPoints !== undefined && f.uploaderPoints !== null ? f.uploaderPoints : ps.promptUploaderReward;
+                                    return `
                                     <tr>
                                         <td><img src="${esc(f.thumbnail_url || '')}" class="thumb-img" onerror="this.style.display='none'"></td>
                                         <td>
@@ -1720,18 +1491,20 @@
                                             <div class="cell-muted">${esc((f.prompt_text || '').substring(0, 60))}...</div>
                                         </td>
                                         <td><span class="badge badge-${f.status === 'approved' ? 'success' : f.status === 'pending' ? 'warning' : 'danger'}">${f.status || 'pending'}</span></td>
-                                        <td><span class="badge badge-primary"><i class="fas fa-play-circle"></i> ${f.required_ads || 0}</span></td>
+                                        <td><span class="badge badge-info">+${uploadPts}</span></td>
+                                        <td><span class="badge badge-primary">+${uploaderPts}</span></td>
                                         <td class="cell-muted">${esc((f.uploadedByEmail || '').split('@')[0])}</td>
                                         <td>
                                             <div class="cell-actions">
-                                                <button class="btn btn-warning btn-sm btn-icon" onclick="editPromptAds('${f.id}')" title="Set Ads"><i class="fas fa-play-circle"></i></button>
+                                                <button class="btn btn-warning btn-sm btn-icon" onclick="editPromptForm('${f.id}')" title="Edit Points"><i class="fas fa-coins"></i></button>
                                                 ${f.status === 'pending' ? `<button class="btn btn-success btn-sm btn-icon" onclick="quickApprove('${f.id}')" title="Approve"><i class="fas fa-check"></i></button>` : ''}
                                                 <button class="btn btn-primary btn-sm btn-icon" onclick="viewPromptText('${f.id}')" title="View"><i class="fas fa-eye"></i></button>
                                                 <button class="btn btn-danger btn-sm btn-icon" onclick="deleteFile('${f.id}', '${esc(f.title || '').replace(/'/g, "\\'")}')" title="Delete"><i class="fas fa-trash"></i></button>
                                             </div>
                                         </td>
                                     </tr>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>`
@@ -1740,26 +1513,51 @@
         `;
     }
 
-    function editPromptAds(fileId) {
+    function editPromptForm(fileId) {
         const file = allFiles.find(f => f.id === fileId);
         if (!file) return;
-        document.getElementById('modal-title').innerHTML = '⚙️ Set Ad Steps';
+        const ps = getPointSettings();
+        
+        document.getElementById('modal-title').innerHTML = '⚙️ Edit Prompt Points';
         document.getElementById('modal-form').innerHTML = `
-            <div class="info-banner"><i class="fas fa-info-circle"></i> ইউজার এই প্রমোট দেখতে কতবার Ads দেখতে হবে সেট করুন।</div>
-            <div class="form-group">
-                <label class="form-label">Ad Steps (Required Ads)</label>
-                <input type="number" id="prompt-ads-input" class="form-input" value="${file.required_ads || 0}" min="0" max="20" required>
-                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 6px;">💡 0 = ফ্রি, 1+ = ঐ পরিমাণ Ads দেখতে হবে</p>
+            <div class="info-banner">
+                <i class="fas fa-info-circle"></i>
+                <span><strong>${esc(file.title)}</strong> — প্রতিটি আইটেমের জন্য আলাদা পয়েন্ট সেট করুন।</span>
             </div>
-            <div class="modal-footer" style="padding: 16px 0 0; margin-top: 16px; border-top: 1px solid var(--border);">
-                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+            
+            <div class="points-input-group">
+                <div style="grid-column: 1 / -1; font-weight: 700; color: #92400e; margin-bottom: 4px;">
+                    <i class="fas fa-coins"></i> Points
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Upload Points</label>
+                    <input type="number" id="prompt-upload-points" class="form-input" value="${file.uploadPoints !== undefined && file.uploadPoints !== null ? file.uploadPoints : ''}" min="0" placeholder="Default: ${ps.promptUploadReward}">
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Uploader Points</label>
+                    <input type="number" id="prompt-uploader-points" class="form-input" value="${file.uploaderPoints !== undefined && file.uploaderPoints !== null ? file.uploaderPoints : ''}" min="0" placeholder="Default: ${ps.promptUploaderReward}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Required Ads (Steps)</label>
+                <input type="number" id="prompt-required-ads" class="form-input" value="${file.required_ads || 0}" min="0">
+                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">ইউজার এই প্রমোট দেখতে কতবার Ad দেখবে</p>
             </div>
         `;
+        
         document.getElementById('modal-form').onsubmit = async (e) => {
             e.preventDefault();
-            const ads = parseInt(document.getElementById('prompt-ads-input').value) || 0;
-            await filesRef.child(fileId).update({ required_ads: ads });
+            const uploadPts = document.getElementById('prompt-upload-points').value.trim();
+            const uploaderPts = document.getElementById('prompt-uploader-points').value.trim();
+            const ads = parseInt(document.getElementById('prompt-required-ads').value) || 0;
+            
+            await filesRef.child(fileId).update({
+                uploadPoints: uploadPts === '' ? null : Number(uploadPts),
+                uploaderPoints: uploaderPts === '' ? null : Number(uploaderPts),
+                required_ads: ads
+            });
+            
             closeModal();
             await loadAllData();
         };
@@ -1779,36 +1577,29 @@
                 <label class="form-label">Prompt</label>
                 <textarea class="form-textarea" rows="10" readonly style="font-family: monospace; font-size: 0.85rem;">${esc(file.prompt_text || '')}</textarea>
             </div>
-            <div class="modal-footer" style="padding: 16px 0 0; margin-top: 16px; border-top: 1px solid var(--border);">
-                <button type="button" class="btn btn-outline" onclick="copyText('${esc((file.prompt_text || '').replace(/'/g, "\\'"))}')"><i class="fas fa-copy"></i> Copy</button>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+                <button type="button" class="btn btn-outline" onclick="copyPromptText('${fileId}')"><i class="fas fa-copy"></i> Copy</button>
                 <button type="button" class="btn btn-primary" onclick="closeModal()">Close</button>
             </div>
         `;
         openModal();
     }
 
-    function copyText(text) {
-        navigator.clipboard.writeText(text).then(() => alert('✅ Copied!')).catch(() => {
-            const t = document.createElement('textarea');
-            t.value = text;
-            document.body.appendChild(t);
-            t.select();
-            document.execCommand('copy');
-            document.body.removeChild(t);
-            alert('✅ Copied!');
-        });
+    function copyPromptText(fileId) {
+        const file = allFiles.find(f => f.id === fileId);
+        if (!file) return;
+        navigator.clipboard.writeText(file.prompt_text || '').then(() => alert('✅ Copied!'));
     }
 
     // ==================== BANNERS ====================
     function renderBanners() {
         document.getElementById('page-content').innerHTML = `
             <div class="page-header">
-                <h1 class="page-title"><i class="fas fa-image"></i> Banners & Sliders</h1>
+                <h1 class="page-title"><i class="fas fa-image"></i> Banners</h1>
                 <button class="btn btn-primary" onclick="openBannerForm()">
                     <i class="fas fa-plus"></i> Add Banner
                 </button>
             </div>
-            <div class="info-banner"><i class="fas fa-info-circle"></i> হোমপেজে স্লাইডার হিসেবে দেখাবে।</div>
             <div class="card">
                 ${allBanners.length === 0 ? 
                     `<div class="empty-state"><i class="fas fa-inbox"></i><p>No banners yet.</p></div>` :
@@ -1820,7 +1611,7 @@
                                     <tr>
                                         <td><img src="${esc(b.thumbnail_url)}" class="thumb-img" style="width: 100px; height: 60px;" onerror="this.src='https://i.postimg.cc/VkCqsjD1/file-00000000fa18821191576f156d4e3bfe.png'"></td>
                                         <td class="cell-title">${esc(b.title || 'Untitled')}</td>
-                                        <td class="cell-muted" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${b.download_url ? esc(b.download_url.substring(0, 40)) + '...' : '—'}</td>
+                                        <td class="cell-muted">${b.download_url ? esc(b.download_url.substring(0, 40)) + '...' : '—'}</td>
                                         <td>
                                             <div class="cell-actions">
                                                 <button class="btn btn-warning btn-sm btn-icon" onclick="openBannerForm('${b.id}')"><i class="fas fa-edit"></i></button>
@@ -1848,22 +1639,15 @@
             <div class="form-group">
                 <label class="form-label">Image URL *</label>
                 <input type="url" id="banner-thumbnail" class="form-input" value="${esc(banner.thumbnail_url || '')}" required>
-                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 6px;">💡 Recommended: 1200×630px</p>
+                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">💡 1200×630px recommended</p>
             </div>
             <div class="form-group">
                 <label class="form-label">Target Link (Optional)</label>
                 <input type="url" id="banner-download-url" class="form-input" value="${esc(banner.download_url || '')}" placeholder="https://example.com">
             </div>
-            <div class="modal-footer" style="padding: 16px 0 0; margin-top: 16px; border-top: 1px solid var(--border);">
-                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="save-banner-btn"><i class="fas fa-save"></i> Save</button>
-            </div>
         `;
         document.getElementById('modal-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('save-banner-btn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Saving...';
             const data = {
                 title: document.getElementById('banner-title').value,
                 thumbnail_url: document.getElementById('banner-thumbnail').value,
@@ -1877,8 +1661,6 @@
                 await loadAllData();
             } catch (error) {
                 showAlert('modal-alert', error.message, 'error');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Save';
             }
         };
         openModal();
@@ -1900,7 +1682,7 @@
         
         document.getElementById('page-content').innerHTML = `
             <div class="page-header">
-                <h1 class="page-title"><i class="fas fa-robot"></i> Admin AI Prompts</h1>
+                <h1 class="page-title"><i class="fas fa-robot"></i> Admin Prompts</h1>
                 <button class="btn btn-primary" onclick="openAdminPromptForm()">
                     <i class="fas fa-plus"></i> Add Prompt
                 </button>
@@ -1908,7 +1690,7 @@
             
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-cog"></i> General Settings</h3>
+                    <h3 class="card-title"><i class="fas fa-cog"></i> Settings</h3>
                 </div>
                 <div id="ai-prompt-alert" class="alert hidden"></div>
                 <form id="ai-prompt-settings-form">
@@ -1922,7 +1704,7 @@
                         <label class="form-label">Gemini AI URL</label>
                         <input type="url" id="ai-prompt-gemini-url" class="form-input" value="${esc(geminiUrl)}">
                     </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                 </form>
             </div>
             
@@ -1934,13 +1716,12 @@
                     `<div class="empty-state"><i class="fas fa-inbox"></i><p>No admin prompts yet.</p></div>` :
                     `<div class="table-wrap">
                         <table class="data-table">
-                            <thead><tr><th>Preview</th><th>Title</th><th>Prompt</th><th>Ads</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Preview</th><th>Title</th><th>Ads</th><th>Actions</th></tr></thead>
                             <tbody>
                                 ${prompts.map((p, i) => `
                                     <tr>
                                         <td>${p.sample_image ? `<img src="${esc(p.sample_image)}" class="thumb-img" onerror="this.style.display='none'">` : '<span class="cell-muted">—</span>'}</td>
                                         <td class="cell-title">${esc(p.title || 'Untitled')}</td>
-                                        <td class="cell-muted" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${esc((p.prompt || '').substring(0, 80))}...</td>
                                         <td><span class="badge badge-primary"><i class="fas fa-play-circle"></i> ${p.required_ads || 0}</span></td>
                                         <td>
                                             <div class="cell-actions">
@@ -1965,7 +1746,7 @@
                     geminiUrl: document.getElementById('ai-prompt-gemini-url').value.trim() || 'https://gemini.google.com/app',
                     prompts: appSettings.aiImage?.prompts || []
                 });
-                showAlert('ai-prompt-alert', '✅ Settings saved!', 'success');
+                showAlert('ai-prompt-alert', '✅ Saved!', 'success');
                 await loadAllData();
             } catch (error) { showAlert('ai-prompt-alert', error.message, 'error'); }
         });
@@ -2000,17 +1781,10 @@
                 <label class="form-label">Detail Photos (one per line)</label>
                 <textarea id="p-photos" class="form-textarea" rows="3">${esc((prompt.detail_photos || []).join('\n'))}</textarea>
             </div>
-            <div class="modal-footer" style="padding: 16px 0 0; margin-top: 16px; border-top: 1px solid var(--border);">
-                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="save-prompt-btn"><i class="fas fa-save"></i> Save</button>
-            </div>
         `;
         
         document.getElementById('modal-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('save-prompt-btn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Saving...';
             try {
                 const newPrompt = {
                     title: document.getElementById('p-title').value.trim(),
@@ -2028,15 +1802,13 @@
                 await loadAllData();
             } catch (error) {
                 showAlert('modal-alert', error.message, 'error');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Save';
             }
         };
         openModal();
     }
 
     function deleteAdminPrompt(index) {
-        openConfirmModal('Delete this prompt permanently?', async () => {
+        openConfirmModal('Delete this prompt?', async () => {
             let prompts = (appSettings.aiImage?.prompts || []).slice();
             prompts.splice(index, 1);
             await settingsRef.child('aiImage').child('prompts').set(prompts);
@@ -2105,10 +1877,10 @@
                                             <td>
                                                 ${w.status === 'pending' ? `
                                                     <div class="cell-actions">
-                                                        <button class="btn btn-success btn-sm" onclick="approveWithdraw('${w.id}')"><i class="fas fa-check"></i> Approve</button>
-                                                        <button class="btn btn-danger btn-sm" onclick="rejectWithdraw('${w.id}')"><i class="fas fa-times"></i> Reject</button>
+                                                        <button class="btn btn-success btn-sm" onclick="approveWithdraw('${w.id}')"><i class="fas fa-check"></i></button>
+                                                        <button class="btn btn-danger btn-sm" onclick="rejectWithdraw('${w.id}')"><i class="fas fa-times"></i></button>
                                                     </div>
-                                                ` : '<span class="cell-muted">—</span>'}
+                                                ` : '—'}
                                             </td>
                                         </tr>
                                     `;
@@ -2124,7 +1896,7 @@
     function approveWithdraw(id) {
         const w = allWithdrawals.find(x => x.id === id);
         if (!w) return;
-        openConfirmModal(`Approve ${w.amount} pts (${(w.taka || 0).toFixed(2)}৳) withdrawal?`, async () => {
+        openConfirmModal(`Approve ${w.amount} pts (${(w.taka || 0).toFixed(2)}৳)?`, async () => {
             await withdrawalsRef.child(id).update({ status: 'approved', approvedAt: Date.now() });
             if (w.uid) {
                 await notificationsRef.push({
@@ -2146,14 +1918,10 @@
             await withdrawalsRef.child(id).update({ status: 'rejected', rejectedAt: Date.now() });
             if (w.uid) {
                 await usersRef.child(w.uid).child('balance').transaction(c => (c || 0) + w.amount);
-                await pointLogsRef.child(w.uid).push({
-                    amount: w.amount,
-                    reason: 'withdraw_rejected_refund',
-                    timestamp: Date.now()
-                });
+                await pointLogsRef.child(w.uid).push({ amount: w.amount, reason: 'withdraw_rejected_refund', timestamp: Date.now() });
                 await notificationsRef.push({
                     title: '❌ Withdrawal Rejected',
-                    decs: `আপনার উইথড্র রিকোয়েস্ট বাতিল হয়েছে। ${w.amount} পয়েন্ট ফেরত দেওয়া হয়েছে।`,
+                    decs: `আপনার উইথড্র রিকোয়েস্ট বাতিল। ${w.amount} পয়েন্ট ফেরত দেওয়া হয়েছে।`,
                     target_uid: w.uid,
                     is_read: false,
                     created_at: Date.now()
@@ -2170,38 +1938,41 @@
             <div class="page-header">
                 <h1 class="page-title"><i class="fas fa-coins"></i> Points System</h1>
             </div>
-            <div class="info-banner"><i class="fas fa-info-circle"></i> ফাইল আপলোড/ডাউনলোডে পয়েন্ট কনফিগার করুন।</div>
+            <div class="info-banner">
+                <i class="fas fa-info-circle"></i>
+                <span>এগুলো <strong>ডিফল্ট</strong> রেট। প্রতিটি ফাইলে আলাদা পয়েন্ট সেট করা যাবে।</span>
+            </div>
             
             <div class="card">
                 <div id="points-alert" class="alert hidden"></div>
                 <form id="points-form">
-                    <h3 class="card-title" style="margin-bottom: 16px;"><i class="fas fa-file"></i> File Upload/Download</h3>
+                    <h3 class="card-title" style="margin-bottom: 16px;"><i class="fas fa-file"></i> File</h3>
                     <div class="grid-3">
                         <div class="form-group">
                             <label class="form-label">Upload Reward</label>
                             <input type="number" id="p-upload" class="form-input" value="${ps.uploadReward}">
-                            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">আপলোড করলে</p>
+                            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">আপলোডে পাবে (approve হলে)</p>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Download Cost</label>
+                            <label class="form-label">Downloader Cost</label>
                             <input type="number" id="p-download" class="form-input" value="${ps.downloadReward}">
-                            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">ডাউনলোডার দেবে</p>
+                            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">0 রাখুন (Earn Only)</p>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Uploader Earns</label>
                             <input type="number" id="p-uploader" class="form-input" value="${ps.uploaderReward}">
-                            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">অন্য কেউ ডাউনলোড করলে</p>
+                            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">অন্য কেউ ডাউনলোডে</p>
                         </div>
                     </div>
                     
                     <div class="form-group" style="margin-top: 16px;">
                         <label style="display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--surface-2); border-radius: 10px; cursor: pointer;">
                             <input type="checkbox" id="p-uploader-toggle" style="width: 20px; height: 20px;" ${ps.uploaderEarnsOnDownload ? 'checked' : ''}>
-                            <span style="font-weight: 600;">অন্য ইউজার ডাউনলোড করলে আপলোডার পয়েন্ট পাবে</span>
+                            <span style="font-weight: 600;">আপলোডার পয়েন্ট পাবে (অন্য কেউ ডাউনলোডে)</span>
                         </label>
                     </div>
                     
-                    <h3 class="card-title" style="margin: 24px 0 16px;"><i class="fas fa-magic"></i> AI Prompt Upload/Download</h3>
+                    <h3 class="card-title" style="margin: 24px 0 16px;"><i class="fas fa-magic"></i> AI Prompt</h3>
                     <div class="grid-3">
                         <div class="form-group">
                             <label class="form-label">Prompt Upload Reward</label>
@@ -2210,6 +1981,7 @@
                         <div class="form-group">
                             <label class="form-label">Prompt Download Cost</label>
                             <input type="number" id="p-prompt-dl" class="form-input" value="${ps.promptDownloadReward}">
+                            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">0 রাখুন (Earn Only)</p>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Prompt Uploader Earns</label>
@@ -2217,7 +1989,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary" style="margin-top: 16px;"><i class="fas fa-save"></i> Save Settings</button>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 16px;"><i class="fas fa-save"></i> Save</button>
                 </form>
             </div>
         `;
@@ -2234,7 +2006,7 @@
                     promptDownloadReward: Number(document.getElementById('p-prompt-dl').value) || 0,
                     promptUploaderReward: Number(document.getElementById('p-prompt-earn').value) || 0
                 });
-                showAlert('points-alert', '✅ Points settings saved!', 'success');
+                showAlert('points-alert', '✅ Saved!', 'success');
                 await loadAllData();
             } catch (error) { showAlert('points-alert', error.message, 'error'); }
         });
@@ -2249,7 +2021,7 @@
             </div>
             
             <div class="card">
-                <div class="card-header"><h3 class="card-title"><i class="fas fa-exchange-alt"></i> Conversion Rate</h3></div>
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-exchange-alt"></i> Conversion</h3></div>
                 <div id="wd-alert" class="alert hidden"></div>
                 <form id="wd-form">
                     <div class="grid-2">
@@ -2258,18 +2030,18 @@
                             <input type="number" id="w-rate" class="form-input" value="${ws.pointToTaka}" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Minimum Withdraw (পয়েন্ট)</label>
+                            <label class="form-label">Minimum Withdraw</label>
                             <input type="number" id="w-min" class="form-input" value="${ws.minWithdraw}" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Rate</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                 </form>
             </div>
             
             <div class="card">
                 <div class="card-header"><h3 class="card-title"><i class="fas fa-credit-card"></i> Payment Methods</h3></div>
                 ${Object.keys(ws.methods).length === 0 ? 
-                    '<div class="empty-state" style="padding: 20px;"><p>No methods yet. Add one below.</p></div>' :
+                    '<div class="empty-state" style="padding: 20px;"><p>No methods yet.</p></div>' :
                     Object.entries(ws.methods).map(([k, m]) => `
                         <div class="method-card">
                             ${m.image ? `<img src="${esc(m.image)}" onerror="this.style.display='none'">` : '<div style="width: 40px; height: 40px; background: var(--border); border-radius: 8px;"></div>'}
@@ -2379,6 +2151,7 @@
                                         </button>
                                         <button class="btn btn-warning btn-sm btn-icon" onclick="editUser('${u.id}')" title="Edit"><i class="fas fa-edit"></i></button>
                                         <button class="btn btn-primary btn-sm btn-icon" onclick="adjustPoints('${u.id}')" title="Points"><i class="fas fa-coins"></i></button>
+                                        <button class="btn btn-warning btn-sm btn-icon" onclick="resetUserPassword('${u.id}')" title="Reset Password" style="background: #f59e0b;"><i class="fas fa-key"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -2390,10 +2163,72 @@
     }
 
     function toggleUserBan(id, isActive) {
-        openConfirmModal(`Are you sure you want to ${isActive ? 'BAN' : 'UNBAN'} this user?`, async () => {
+        openConfirmModal(`${isActive ? 'BAN' : 'UNBAN'} this user?`, async () => {
             await usersRef.child(id).update({ isAccountActive: !isActive });
             await loadAllData();
         });
+    }
+
+    // ⭐ PASSWORD RESET (Admin sets new password directly)
+    function resetUserPassword(userId) {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) return;
+        
+        document.getElementById('modal-title').innerHTML = '🔑 Reset User Password';
+        document.getElementById('modal-form').innerHTML = `
+            <div class="info-banner">
+                <i class="fas fa-info-circle"></i>
+                <span><strong>${esc(user.username || user.email)}</strong> এর জন্য নতুন পাসওয়ার্ড সেট করুন।</span>
+            </div>
+            
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span><strong>গুরুত্বপূর্ণ:</strong> Firebase Client SDK দিয়ে অন্য ইউজারের পাসওয়ার্ড সরাসরি পরিবর্তন করা যায় না। নিচের ২টি উপায় ব্যবহার করুন:</span>
+            </div>
+            
+            <div style="background: var(--surface-2); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <h4 style="margin: 0 0 10px; color: var(--primary);">📌 উপায় ১: Password Reset Email পাঠান</h4>
+                <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 12px;">ইউজার ইমেইলে লিংক পাবে, ক্লিক করে নিজে নতুন পাসওয়ার্ড সেট করবে।</p>
+                <button type="button" class="btn btn-primary btn-block" onclick="sendResetEmail('${user.email}')">
+                    <i class="fas fa-envelope"></i> Send Reset Email to ${esc(user.email)}
+                </button>
+            </div>
+            
+            <div style="background: #fef3c7; border-radius: 12px; padding: 16px;">
+                <h4 style="margin: 0 0 10px; color: #92400e;">📌 উপায় ২: Force Password Change</h4>
+                <p style="font-size: 0.85rem; color: #92400e; margin-bottom: 12px;">ইউজার পরের লগইনে নতুন পাসওয়ার্ড সেট করতে বাধ্য হবে।</p>
+                <button type="button" class="btn btn-warning btn-block" onclick="forcePasswordChange('${userId}')">
+                    <i class="fas fa-key"></i> Force Password Change on Next Login
+                </button>
+            </div>
+        `;
+        openModal();
+    }
+
+    async function sendResetEmail(email) {
+        if (!email) { alert('No email'); return; }
+        try {
+            await auth.sendPasswordResetEmail(email);
+            closeModal();
+            alert('✅ Reset email sent to ' + email);
+        } catch (e) {
+            alert('❌ Error: ' + e.message);
+        }
+    }
+
+    async function forcePasswordChange(userId) {
+        try {
+            await usersRef.child(userId).update({ 
+                forcePasswordChange: true,
+                passwordChangeRequestedAt: Date.now(),
+                passwordChangeRequestedBy: currentUser.uid
+            });
+            closeModal();
+            alert('✅ ইউজার পরের লগইনে নতুন পাসওয়ার্ড সেট করতে বাধ্য হবে।');
+            await loadAllData();
+        } catch(e) {
+            alert('❌ ' + e.message);
+        }
     }
 
     function editUser(id) {
@@ -2413,10 +2248,6 @@
                 <label class="form-label">Full Name</label>
                 <input type="text" id="u-fullname" class="form-input" value="${esc(user.fullname || '')}">
             </div>
-            <div class="modal-footer" style="padding: 16px 0 0; margin-top: 16px; border-top: 1px solid var(--border);">
-                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
-            </div>
         `;
         document.getElementById('modal-form').onsubmit = async (e) => {
             e.preventDefault();
@@ -2435,18 +2266,16 @@
         if (!user) return;
         document.getElementById('modal-title').innerHTML = '💰 Adjust Points';
         document.getElementById('modal-form').innerHTML = `
-            <div class="info-banner"><i class="fas fa-user"></i> <strong>${esc(user.username || user.email)}</strong> — Current: <strong>${user.balance || 0} pts</strong></div>
+            <div class="info-banner">
+                <i class="fas fa-user"></i> <strong>${esc(user.username || user.email)}</strong> — Current: <strong>${user.balance || 0} pts</strong>
+            </div>
             <div class="form-group">
-                <label class="form-label">Amount (use negative to deduct)</label>
+                <label class="form-label">Amount (negative to deduct)</label>
                 <input type="number" id="adj-amount" class="form-input" placeholder="e.g., 100 or -50" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Reason</label>
                 <input type="text" id="adj-reason" class="form-input" value="admin_adjustment">
-            </div>
-            <div class="modal-footer" style="padding: 16px 0 0; margin-top: 16px; border-top: 1px solid var(--border);">
-                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Apply</button>
             </div>
         `;
         document.getElementById('modal-form').onsubmit = async (e) => {
@@ -2473,7 +2302,7 @@
                 <div id="notif-alert" class="alert hidden"></div>
                 <form id="notif-form">
                     <div class="form-group">
-                        <label class="form-label">Target UID (leave empty for ALL users)</label>
+                        <label class="form-label">Target UID (empty for ALL)</label>
                         <input type="text" id="n-target" class="form-input" placeholder="Leave empty for all">
                     </div>
                     <div class="form-group">
@@ -2484,10 +2313,9 @@
                         <label class="form-label">Message *</label>
                         <textarea id="n-message" class="form-textarea" rows="4" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" id="send-btn"><i class="fas fa-paper-plane"></i> Send Notification</button>
+                    <button type="submit" class="btn btn-primary" id="send-btn"><i class="fas fa-paper-plane"></i> Send</button>
                 </form>
             </div>
-            
             <div class="card">
                 <div class="card-header"><h3 class="card-title"><i class="fas fa-history"></i> Recent</h3></div>
                 <div id="notif-list"><div class="empty-state"><p>Loading...</p></div></div>
@@ -2501,22 +2329,21 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Sending...';
             try {
-                const target = document.getElementById('n-target').value.trim() || 'all';
                 await notificationsRef.push({
                     title: document.getElementById('n-title').value,
                     decs: document.getElementById('n-message').value,
-                    target_uid: target,
+                    target_uid: document.getElementById('n-target').value.trim() || 'all',
                     is_read: false,
                     created_at: Date.now()
                 });
-                showAlert('notif-alert', '✅ Notification sent!', 'success');
+                showAlert('notif-alert', '✅ Sent!', 'success');
                 document.getElementById('notif-form').reset();
                 loadRecentNotifications();
             } catch (error) {
                 showAlert('notif-alert', error.message, 'error');
             }
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Notification';
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
         });
     }
 
@@ -2537,7 +2364,7 @@
                         ${notifs.map(n => `
                             <tr>
                                 <td class="cell-title">${esc(n.title || '')}</td>
-                                <td><span class="badge badge-${n.target_uid === 'all' ? 'primary' : 'info'}">${n.target_uid === 'all' ? 'All Users' : esc((n.target_uid || '').substring(0, 8)) + '...'}</span></td>
+                                <td><span class="badge badge-${n.target_uid === 'all' ? 'primary' : 'info'}">${n.target_uid === 'all' ? 'All' : esc((n.target_uid || '').substring(0, 8)) + '...'}</span></td>
                                 <td class="cell-muted">${n.created_at ? new Date(n.created_at).toLocaleString() : 'N/A'}</td>
                                 <td><button class="btn btn-danger btn-sm btn-icon" onclick="deleteNotif('${n.id}')"><i class="fas fa-trash"></i></button></td>
                             </tr>
@@ -2563,18 +2390,17 @@
             <div class="page-header">
                 <h1 class="page-title"><i class="fas fa-user-shield"></i> Admin Info</h1>
             </div>
-            <div class="info-banner"><i class="fas fa-info-circle"></i> এই তথ্য AI Chat এ ব্যবহার হবে।</div>
             
             <div class="card">
                 <div class="card-header"><h3 class="card-title"><i class="fas fa-user"></i> Basic Info</h3></div>
                 <div id="admin-info-alert" class="alert hidden"></div>
                 <form id="admin-info-form">
                     <div class="form-group">
-                        <label class="form-label">Admin Display Name</label>
-                        <input type="text" id="ai-name" class="form-input" value="${esc(a.name || 'FILE HUB এডমিন')}" required>
+                        <label class="form-label">Admin Name</label>
+                        <input type="text" id="ai-name" class="form-input" value="${esc(a.name || 'FILE HUB Admin')}" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">About Admin (Optional)</label>
+                        <label class="form-label">Bio</label>
                         <textarea id="ai-bio" class="form-textarea" rows="3">${esc(a.bio || '')}</textarea>
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
@@ -2585,45 +2411,41 @@
                 <div class="card-header"><h3 class="card-title"><i class="fas fa-share-alt"></i> Social Media</h3></div>
                 <div id="admin-social-alert" class="alert hidden"></div>
                 <form id="admin-social-form">
-                    <div class="form-group"><label class="form-label">Telegram</label><div class="social-row"><div class="social-icon telegram"><i class="fab fa-telegram-plane"></i></div><input type="url" id="s-telegram" value="${esc(social.telegram || '')}" placeholder="https://t.me/username"></div></div>
-                    <div class="form-group"><label class="form-label">Facebook</label><div class="social-row"><div class="social-icon facebook"><i class="fab fa-facebook-f"></i></div><input type="url" id="s-facebook" value="${esc(social.facebook || '')}" placeholder="https://facebook.com/page"></div></div>
-                    <div class="form-group"><label class="form-label">YouTube</label><div class="social-row"><div class="social-icon youtube"><i class="fab fa-youtube"></i></div><input type="url" id="s-youtube" value="${esc(social.youtube || '')}" placeholder="https://youtube.com/@channel"></div></div>
-                    <div class="form-group"><label class="form-label">WhatsApp</label><div class="social-row"><div class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></div><input type="url" id="s-whatsapp" value="${esc(social.whatsapp || '')}" placeholder="https://wa.me/880..."></div></div>
-                    <div class="form-group"><label class="form-label">Instagram</label><div class="social-row"><div class="social-icon instagram"><i class="fab fa-instagram"></i></div><input type="url" id="s-instagram" value="${esc(social.instagram || '')}" placeholder="https://instagram.com/page"></div></div>
-                    <div class="form-group"><label class="form-label">Twitter / X</label><div class="social-row"><div class="social-icon twitter"><i class="fab fa-twitter"></i></div><input type="url" id="s-twitter" value="${esc(social.twitter || '')}" placeholder="https://twitter.com/handle"></div></div>
-                    <div class="form-group"><label class="form-label">Email</label><div class="social-row"><div class="social-icon email"><i class="fas fa-envelope"></i></div><input type="email" id="s-email" value="${esc(social.email || '')}" placeholder="admin@filehub.com"></div></div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Social Media</button>
+                    <div class="form-group"><label class="form-label">Telegram</label><input type="url" id="s-telegram" class="form-input" value="${esc(social.telegram || '')}"></div>
+                    <div class="form-group"><label class="form-label">Facebook</label><input type="url" id="s-facebook" class="form-input" value="${esc(social.facebook || '')}"></div>
+                    <div class="form-group"><label class="form-label">YouTube</label><input type="url" id="s-youtube" class="form-input" value="${esc(social.youtube || '')}"></div>
+                    <div class="form-group"><label class="form-label">WhatsApp</label><input type="url" id="s-whatsapp" class="form-input" value="${esc(social.whatsapp || '')}"></div>
+                    <div class="form-group"><label class="form-label">Instagram</label><input type="url" id="s-instagram" class="form-input" value="${esc(social.instagram || '')}"></div>
+                    <div class="form-group"><label class="form-label">Twitter</label><input type="url" id="s-twitter" class="form-input" value="${esc(social.twitter || '')}"></div>
+                    <div class="form-group"><label class="form-label">Email</label><input type="email" id="s-email" class="form-input" value="${esc(social.email || '')}"></div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                 </form>
             </div>
         `;
         
         document.getElementById('admin-info-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            try {
-                await settingsRef.child('admin').update({
-                    name: document.getElementById('ai-name').value.trim(),
-                    bio: document.getElementById('ai-bio').value.trim()
-                });
-                showAlert('admin-info-alert', '✅ Saved!', 'success');
-                await loadAllData();
-            } catch (error) { showAlert('admin-info-alert', error.message, 'error'); }
+            await settingsRef.child('admin').update({
+                name: document.getElementById('ai-name').value.trim(),
+                bio: document.getElementById('ai-bio').value.trim()
+            });
+            showAlert('admin-info-alert', '✅ Saved!', 'success');
+            await loadAllData();
         });
         
         document.getElementById('admin-social-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            try {
-                await settingsRef.child('admin').child('social').update({
-                    telegram: document.getElementById('s-telegram').value.trim(),
-                    facebook: document.getElementById('s-facebook').value.trim(),
-                    youtube: document.getElementById('s-youtube').value.trim(),
-                    whatsapp: document.getElementById('s-whatsapp').value.trim(),
-                    instagram: document.getElementById('s-instagram').value.trim(),
-                    twitter: document.getElementById('s-twitter').value.trim(),
-                    email: document.getElementById('s-email').value.trim()
-                });
-                showAlert('admin-social-alert', '✅ Saved!', 'success');
-                await loadAllData();
-            } catch (error) { showAlert('admin-social-alert', error.message, 'error'); }
+            await settingsRef.child('admin').child('social').update({
+                telegram: document.getElementById('s-telegram').value.trim(),
+                facebook: document.getElementById('s-facebook').value.trim(),
+                youtube: document.getElementById('s-youtube').value.trim(),
+                whatsapp: document.getElementById('s-whatsapp').value.trim(),
+                instagram: document.getElementById('s-instagram').value.trim(),
+                twitter: document.getElementById('s-twitter').value.trim(),
+                email: document.getElementById('s-email').value.trim()
+            });
+            showAlert('admin-social-alert', '✅ Saved!', 'success');
+            await loadAllData();
         });
     }
 
@@ -2637,18 +2459,18 @@
             </div>
             
             <div class="card">
-                <div class="card-header"><h3 class="card-title"><i class="fas fa-tools"></i> Maintenance Mode</h3></div>
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-tools"></i> Maintenance</h3></div>
                 <div id="maint-alert" class="alert hidden"></div>
                 <form id="maint-form">
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface-2); border-radius: 10px; cursor: pointer;">
                             <input type="checkbox" id="s-closed" style="width: 20px; height: 20px;" ${app.siteClosed ? 'checked' : ''}>
-                            <span style="font-weight: 600;">সাইট বন্ধ রাখুন (Maintenance Mode)</span>
+                            <span style="font-weight: 600;">Site Closed (Maintenance Mode)</span>
                         </label>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">বন্ধ থাকার সময় মেসেজ</label>
-                        <input type="text" id="s-closed-msg" class="form-input" value="${esc(app.siteClosedMessage || 'সাইট সাময়িক বন্ধ আছে।')}">
+                        <label class="form-label">Closed Message</label>
+                        <input type="text" id="s-closed-msg" class="form-input" value="${esc(app.siteClosedMessage || 'সাইট সাময়িক বন্ধ')}">
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                 </form>
@@ -2659,7 +2481,7 @@
                 <div id="reg-alert" class="alert hidden"></div>
                 <form id="reg-form">
                     <div class="form-group">
-                        <label class="form-label">নতুন ইউজার কত পয়েন্ট পাবে</label>
+                        <label class="form-label">New User Points</label>
                         <input type="number" id="s-reg-bonus" class="form-input" value="${app.registrationBonus || 0}">
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
@@ -2693,7 +2515,6 @@
                     <div class="form-group">
                         <label class="form-label">Ad Wait Time (seconds)</label>
                         <input type="number" id="s-ad-wait" class="form-input" value="${ads.adWaitSeconds || 8}" min="1" max="60">
-                        <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">⏱️ ইউজার কত সেকেন্ড অপেক্ষা করবে (default: 8)</p>
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                 </form>
@@ -2777,13 +2598,12 @@
                 apiKey: document.getElementById('s-ai-key').value,
                 model: document.getElementById('s-ai-model').value
             });
-            await settingsRef.child('aiApiKey').set(document.getElementById('s-ai-key').value);
             showAlert('ai-alert', '✅ Saved!', 'success');
             await loadAllData();
         });
     }
 
-    // ==================== EXPOSE GLOBALS ====================
+    // ==================== EXPOSE ====================
     window.loadPage = loadPage;
     window.loadAllData = loadAllData;
     window.toggleSidebar = toggleSidebar;
@@ -2799,9 +2619,9 @@
     window.quickApprove = quickApprove;
     window.openBannerForm = openBannerForm;
     window.deleteBanner = deleteBanner;
-    window.editPromptAds = editPromptAds;
+    window.editPromptForm = editPromptForm;
     window.viewPromptText = viewPromptText;
-    window.copyText = copyText;
+    window.copyPromptText = copyPromptText;
     window.openAdminPromptForm = openAdminPromptForm;
     window.deleteAdminPrompt = deleteAdminPrompt;
     window.approveWithdraw = approveWithdraw;
@@ -2811,6 +2631,9 @@
     window.toggleUserBan = toggleUserBan;
     window.editUser = editUser;
     window.adjustPoints = adjustPoints;
+    window.resetUserPassword = resetUserPassword;
+    window.sendResetEmail = sendResetEmail;
+    window.forcePasswordChange = forcePasswordChange;
     window.deleteNotif = deleteNotif;
 </script>
 
