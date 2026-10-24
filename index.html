@@ -229,9 +229,9 @@
             gap: 6px; flex-wrap: wrap;
         }
         .meta-pill { 
-            background: var(--primary-light); color: var(--primary-dark); 
+            background: var(--bg); color: var(--text-sub); 
             padding: 3px 8px; border-radius: var(--radius-sm); font-size: 0.65rem; 
-            font-weight: 700; display: flex; align-items: center; gap: 4px; 
+            font-weight: 600; display: flex; align-items: center; gap: 4px; 
             white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
         }
         @media (min-width: 768px) { .meta-pill { font-size: .75rem; padding: 4px 10px; } }
@@ -249,15 +249,17 @@
         .prompt-file-badge { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
         .apk-file-badge { background: linear-gradient(135deg, #10b981, #34d399); }
         
-        .points-badge-card { 
+        /* ⭐ NEW: Only Download Points Badge (Earn) */
+        .download-points-badge { 
             position: absolute; top: 8px; right: 8px; color: #fff; 
-            padding: 3px 8px; border-radius: var(--radius-pill); 
-            font-size: .6rem; font-weight: 800; z-index: 3; 
-            background: linear-gradient(135deg, #f59e0b, #f97316); 
-            white-space: nowrap; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+            padding: 4px 10px; border-radius: var(--radius-pill); 
+            font-size: .65rem; font-weight: 800; z-index: 3; 
+            background: linear-gradient(135deg, #10b981, #34d399); 
+            white-space: nowrap; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+            display: flex; align-items: center; gap: 4px;
         }
         @media (min-width: 768px) { 
-            .points-badge-card { top: 12px; right: 12px; padding: 4px 12px; font-size: .7rem; } 
+            .download-points-badge { top: 12px; right: 12px; padding: 4px 12px; font-size: .7rem; } 
         }
 
         /* ============ SECTION HEADERS ============ */
@@ -801,11 +803,11 @@
         const p = appSettings.points || {};
         return {
             uploadReward: p.uploadReward !== undefined ? Number(p.uploadReward) : 10,
-            downloadReward: p.downloadReward !== undefined ? Number(p.downloadReward) : 0,
+            downloadReward: p.downloadReward !== undefined ? Number(p.downloadReward) : 0, // ⭐ User Income on Download
             uploaderReward: p.uploaderReward !== undefined ? Number(p.uploaderReward) : 5,
             uploaderEarnsOnDownload: p.uploaderEarnsOnDownload !== false,
             promptUploadReward: p.promptUploadReward !== undefined ? Number(p.promptUploadReward) : 15,
-            promptDownloadReward: p.promptDownloadReward !== undefined ? Number(p.promptDownloadReward) : 0,
+            promptDownloadReward: p.promptDownloadReward !== undefined ? Number(p.promptDownloadReward) : 0, // ⭐ User Income on Prompt Copy
             promptUploaderReward: p.promptUploaderReward !== undefined ? Number(p.promptUploaderReward) : 8
         };
     }
@@ -857,29 +859,39 @@
         
         let earned = 0;
         
+        // ⭐ 1. Give Download Income to current user (Downloader/Copier)
+        // (Assuming downloadReward is what user EARNs based on previous instructions)
+        let downloadIncome = isPrompt ? ps.promptDownloadReward : ps.downloadReward;
+        
+        // Override with per-item if set (if you have specific download points set on the file)
+        // Currently frontend uses global downloadReward as income. 
+        // If you add a specific "downloadPoints" field to files, uncomment below:
+        // if (item.downloadPoints !== undefined && item.downloadPoints !== null) downloadIncome = Number(item.downloadPoints);
+
+        if (downloadIncome > 0) {
+            const success = await addPointsToUser(
+                currentUser.uid, 
+                downloadIncome, 
+                (isPrompt ? 'earned_from_prompt:' : 'earned_from_download:') + item.id
+            );
+            if (success) earned += downloadIncome;
+        }
+        
+        // ⭐ 2. Reward Uploader (Not affecting display anymore, just backend logic)
         if (!isAdminOwner && ps.uploaderEarnsOnDownload) {
             let reward;
             if (isPrompt) {
-                if (item.uploaderPoints !== undefined && item.uploaderPoints !== null) {
-                    reward = Number(item.uploaderPoints);
-                } else {
-                    reward = ps.promptUploaderReward;
-                }
+                reward = (item.uploaderPoints !== undefined && item.uploaderPoints !== null) ? Number(item.uploaderPoints) : ps.promptUploaderReward;
             } else {
-                if (item.uploaderPoints !== undefined && item.uploaderPoints !== null) {
-                    reward = Number(item.uploaderPoints);
-                } else {
-                    reward = ps.uploaderReward;
-                }
+                reward = (item.uploaderPoints !== undefined && item.uploaderPoints !== null) ? Number(item.uploaderPoints) : ps.uploaderReward;
             }
             
             if (reward > 0) {
-                const success = await addPointsToUser(
+                await addPointsToUser(
                     item.uploadedBy, 
                     reward, 
                     (isPrompt ? 'prompt_copied_by:' : 'downloaded_by:') + currentUser.uid + ':' + item.id
                 );
-                if (success) earned = reward;
             }
         }
         
@@ -1462,13 +1474,20 @@
             : isAPK ? '<span class="apk-file-badge">' + cssEmoji('apk') + ' APK</span>' : '';
         const ext = isAI ? 'ai' : (f.file_extension || 'file');
         
-        let pointsBadge = '';
-        if (f.uploaderPoints !== undefined && f.uploaderPoints !== null && Number(f.uploaderPoints) > 0) {
-            pointsBadge = '<span class="points-badge-card">+' + f.uploaderPoints + ' pts</span>';
+        // ⭐ Only Download Income Badge
+        let downloadIncome = 0;
+        const ps = getPointSettings();
+        
+        if (isAI) {
+            // For prompt, check per-item download points if exists, else global
+            downloadIncome = (f.downloadPoints !== undefined && f.downloadPoints !== null) ? Number(f.downloadPoints) : ps.promptDownloadReward;
         } else {
-            const ps = getPointSettings();
-            const r = isAI ? ps.promptUploaderReward : ps.uploaderReward;
-            if (r > 0) pointsBadge = '<span class="points-badge-card">+' + r + ' pts</span>';
+            downloadIncome = (f.downloadPoints !== undefined && f.downloadPoints !== null) ? Number(f.downloadPoints) : ps.downloadReward;
+        }
+
+        let pointsBadge = '';
+        if (downloadIncome > 0) {
+            pointsBadge = '<span class="download-points-badge">' + cssEmoji('money') + ' +' + downloadIncome + ' pts</span>';
         }
         
         return '<div class="file-card" onclick="navigateTo(\'/file/' + f.id + '\')">' + badge + pointsBadge +
@@ -1599,15 +1618,13 @@
         const isOwn = currentUser && item.uploadedBy === currentUser.uid;
 
         const ps = getPointSettings();
-        let uploaderReward = 0;
+        
+        // ⭐ Calculate Download Income
+        let downloadIncome = 0;
         if (isAI) {
-            uploaderReward = (item.uploaderPoints !== undefined && item.uploaderPoints !== null) 
-                ? Number(item.uploaderPoints) 
-                : ps.promptUploaderReward;
+            downloadIncome = (item.downloadPoints !== undefined && item.downloadPoints !== null) ? Number(item.downloadPoints) : ps.promptDownloadReward;
         } else {
-            uploaderReward = (item.uploaderPoints !== undefined && item.uploaderPoints !== null) 
-                ? Number(item.uploaderPoints) 
-                : ps.uploaderReward;
+            downloadIncome = (item.downloadPoints !== undefined && item.downloadPoints !== null) ? Number(item.downloadPoints) : ps.downloadReward;
         }
 
         if (watched < req && req > 0) {
@@ -1622,8 +1639,8 @@
         }
 
         if (isAI) {
-            const rewardMsg = (!isOwn && uploaderReward > 0) 
-                ? '<div style="text-align:center;margin-top:14px;font-size:.9rem;color:var(--success);font-weight:700; background:var(--success-light); padding:8px; border-radius:8px;">' + cssEmoji('money') + ' আপলোডার +' + uploaderReward + ' পয়েন্ট পাবেন</div>'
+            const incomeMsg = (!isOwn && downloadIncome > 0) 
+                ? '<div style="text-align:center;margin-top:14px;font-size:.95rem;color:var(--success);font-weight:700; background:var(--success-light); padding:10px; border-radius:10px;">' + cssEmoji('money') + ' আপনি +' + downloadIncome + ' পয়েন্ট পাবেন</div>'
                 : '';
             
             zone.innerHTML = 
@@ -1646,12 +1663,12 @@
                         '<button class="prompt-action-btn gemini-btn-main" onclick="openGemini(\'' + escapeHtmlUser(item.prompt_text || '').replace(/'/g, "\\'").replace(/\n/g, '\\n') + '\')">' +
                             '<i class="fas fa-gem"></i> Open Gemini AI' +
                         '</button>' +
-                    '</div>' + rewardMsg +
+                    '</div>' + incomeMsg +
                     '<div id="dlStatus" style="text-align:center;margin-top:12px;font-size:.9rem;color:var(--text-sub);"></div>' +
                 '</div>';
         } else {
-            const rewardMsg = (!isOwn && uploaderReward > 0) 
-                ? '<div style="text-align:center;margin-top:14px;font-size:.9rem;color:var(--success);font-weight:700; background:var(--success-light); padding:8px; border-radius:8px;">' + cssEmoji('money') + ' আপলোডার +' + uploaderReward + ' পয়েন্ট পাবেন</div>'
+            const incomeMsg = (!isOwn && downloadIncome > 0) 
+                ? '<div style="text-align:center;margin-top:14px;font-size:.95rem;color:var(--success);font-weight:700; background:var(--success-light); padding:10px; border-radius:10px;">' + cssEmoji('money') + ' আপনি +' + downloadIncome + ' পয়েন্ট পাবেন</div>'
                 : '';
             
             zone.innerHTML = 
@@ -1660,7 +1677,7 @@
                     '<button class="prompt-action-btn share-btn-main" style="flex: 0 0 auto; padding: 16px 20px; border-radius:var(--radius-md);" onclick="sharePrompt(this, \'' + shareUrl.replace(/'/g, "\\'") + '\', \'' + pageTitle.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\')">' +
                         '<i class="fas fa-share-nodes"></i> Share' +
                     '</button>' +
-                '</div>' + rewardMsg +
+                '</div>' + incomeMsg +
                 '<div id="dlStatus" style="text-align:center;margin-top:12px;font-size:.9rem;color:var(--text-sub);"></div>';
             const dlBtn = document.getElementById('dlBtn');
             if (dlBtn) dlBtn.onclick = () => handleDownload(type, item, dlBtn);
@@ -1680,8 +1697,8 @@
         const tx = await executeTransaction(item, isPrompt);
         
         if (tx.earned > 0) {
-            showToast('✅ আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন', 'success');
-            if (statusEl) statusEl.innerHTML = '✅ আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন';
+            showToast('✅ আপনি +' + tx.earned + ' পয়েন্ট পেয়েছেন!', 'success');
+            if (statusEl) statusEl.innerHTML = '✅ আপনি +' + tx.earned + ' পয়েন্ট পেয়েছেন!';
         } else if (tx.reason === 'own_content') {
             if (statusEl) statusEl.innerHTML = '✅ নিজের ফাইল — কোনো ট্রানজ্যাকশন নেই';
         }
@@ -1697,7 +1714,7 @@
         const tx = await executeTransaction(item, true);
         
         if (tx.earned > 0) {
-            showToast('✅ Prompt ready! আপলোডার +' + tx.earned + ' পয়েন্ট পেয়েছেন', 'success');
+            showToast('✅ Prompt ready! আপনি +' + tx.earned + ' পয়েন্ট পেয়েছেন!', 'success');
         } else if (tx.reason === 'own_content') {
             showToast('✅ নিজের প্রমোট — কোনো ট্রানজ্যাকশন নেই', 'info');
         } else if (tx.reason === 'already_processed') {
@@ -2121,10 +2138,7 @@
                             const cls = f.status === 'approved' ? 'status-approved' : f.status === 'pending' ? 'status-pending' : 'status-rejected';
                             const statusIcon = f.status === 'approved' ? cssEmoji('check') : f.status === 'pending' ? cssEmoji('clock') : cssEmoji('times');
                             const badge = f.isPromptUpload ? '<span class="prompt-file-badge">' + cssEmoji('magic') + ' Prompt</span>' : '';
-                            const pointsBadge = (f.status === 'approved' && f.uploadPoints) 
-                                ? '<span class="points-badge-card">+' + f.uploadPoints + ' pts</span>' 
-                                : '';
-                            return '<div class="file-card" onclick="navigateTo(\'/file/' + f.id + '\')">' + badge + pointsBadge +
+                            return '<div class="file-card" onclick="navigateTo(\'/file/' + f.id + '\')">' + badge +
                                 '<div class="card-thumb-wrap"><img src="' + escapeHtmlUser(f.thumbnail_url || '') + '" class="card-thumb" loading="lazy" onerror="this.src=\'https://i.postimg.cc/VkCqsjD1/file-00000000fa18821191576f156d4e3bfe.png\'"></div>' +
                                 '<div class="card-body"><div class="card-title">' + escapeHtmlUser(f.title) + '</div>' +
                                 '<div class="card-footer"><span class="status-badge ' + cls + '">' + statusIcon + ' ' + (f.status || 'pending') + '</span>' +
