@@ -813,10 +813,12 @@
     }
     function getWithdrawSettings() {
         const w = appSettings.withdraw || {};
-        return {
-            pointToTaka: w.pointToTaka !== undefined ? Number(w.pointToTaka) : 100,
-            minWithdraw: w.minWithdraw !== undefined ? Number(w.minWithdraw) : 500,
-            methods: w.methods || {}
+        return { 
+            pointToTaka: w.pointToTaka ?? 100, 
+            minWithdraw: w.minWithdraw ?? 500, 
+            chargeType: w.chargeType ?? 'percent', // 'percent' or 'fixed'
+            chargeAmount: w.chargeAmount ?? 0,
+            methods: w.methods || {} 
         };
     }
 
@@ -860,13 +862,7 @@
         let earned = 0;
         
         // ⭐ 1. Give Download Income to current user (Downloader/Copier)
-        // (Assuming downloadReward is what user EARNs based on previous instructions)
         let downloadIncome = isPrompt ? ps.promptDownloadReward : ps.downloadReward;
-        
-        // Override with per-item if set (if you have specific download points set on the file)
-        // Currently frontend uses global downloadReward as income. 
-        // If you add a specific "downloadPoints" field to files, uncomment below:
-        // if (item.downloadPoints !== undefined && item.downloadPoints !== null) downloadIncome = Number(item.downloadPoints);
 
         if (downloadIncome > 0) {
             const success = await addPointsToUser(
@@ -1479,7 +1475,6 @@
         const ps = getPointSettings();
         
         if (isAI) {
-            // For prompt, check per-item download points if exists, else global
             downloadIncome = (f.downloadPoints !== undefined && f.downloadPoints !== null) ? Number(f.downloadPoints) : ps.promptDownloadReward;
         } else {
             downloadIncome = (f.downloadPoints !== undefined && f.downloadPoints !== null) ? Number(f.downloadPoints) : ps.downloadReward;
@@ -2176,6 +2171,7 @@
         openModal('editProfileModal');
     };
 
+    // ⭐ WITHDRAW MODAL WITH CHARGE CALCULATION
     window.openWithdrawModal = function() {
         const ws = getWithdrawSettings();
         const bal = (currentUserData && currentUserData.balance) || 0;
@@ -2191,11 +2187,23 @@
         document.getElementById('withdrawModalContent').innerHTML =
             '<h2 class="modal-title">Withdraw Points</h2>' +
             '<div class="alert alert-info" style="font-weight:600;">' + cssEmoji('info') + ' ' + ws.pointToTaka + ' পয়েন্ট = ১ টাকা · সর্বনিম্ন ' + ws.minWithdraw + ' পয়েন্ট</div>' +
+            
             '<div style="text-align:center;margin:24px 0; background:var(--bg); padding:20px; border-radius:var(--radius-lg);">' +
                 '<div style="font-size:2.8rem;font-weight:800;color:var(--primary); font-family:Outfit;">' + bal + '</div>' +
                 '<div style="color:var(--text-sub); font-weight:600; margin-bottom:8px;">আপনার পয়েন্ট</div>' +
                 '<div style="color:var(--success);font-weight:700; font-size:1.1rem; background:var(--success-light); display:inline-block; padding:4px 12px; border-radius:20px;">≈ ' + (bal / ws.pointToTaka).toFixed(2) + ' টাকা</div>' +
             '</div>' +
+            
+            // Charge Info Display
+            (ws.chargeAmount > 0 ? 
+            '<div style="background:var(--warning-light); border-left:4px solid var(--warning); padding:12px; border-radius:8px; margin-bottom:20px;">' +
+                '<div style="font-weight:700; color:#92400e; font-size:0.9rem; display:flex; align-items:center; gap:6px;">' +
+                    cssEmoji('info') + ' Withdraw Charge: ' + 
+                    (ws.chargeType === 'percent' ? ws.chargeAmount + '%' : ws.chargeAmount + ' Points') +
+                '</div>' +
+                '<div style="font-size:0.8rem; color:#92400e; margin-top:4px;">চার্জ বাদ দিয়ে বাকি টাকা আপনার অ্যাকাউন্টে যাবে।</div>' +
+            '</div>' : '') +
+
             '<div id="wdAlert" class="alert hidden"></div>' +
             (Object.keys(ws.methods).length === 0 
                 ? '<p style="text-align:center;color:var(--text-sub);padding:20px;">কোনো পেমেন্ট মেথড নেই।</p>'
@@ -2215,19 +2223,33 @@
             const account = document.getElementById('wdAccount').value.trim();
             if (amount < ws.minWithdraw) { document.getElementById('wdAlert').className = 'alert alert-error'; document.getElementById('wdAlert').innerText = 'Minimum ' + ws.minWithdraw; return; }
             if (amount > bal) { document.getElementById('wdAlert').className = 'alert alert-error'; document.getElementById('wdAlert').innerText = 'Insufficient'; return; }
+            
+            // Deduct amount from user balance
             const ok = await deductPointsFromUser(currentUser.uid, amount, 'withdraw_request');
             if (!ok) return;
+            
+            // Calculate Charge for record
+            let chargePts = 0;
+            if (ws.chargeType === 'percent') {
+                chargePts = (amount * ws.chargeAmount) / 100;
+            } else {
+                chargePts = ws.chargeAmount;
+            }
+            const finalTaka = (amount - chargePts) / ws.pointToTaka;
+            
             await withdrawalsRef.push({
                 uid: currentUser.uid, email: currentUser.email,
                 username: (currentUserData && currentUserData.username) || '',
-                method: method.value, amount, taka: amount / ws.pointToTaka,
-                account, status: 'pending', createdAt: Date.now()
+                method: method.value, amount: amount, taka: finalTaka,
+                chargeApplied: chargePts,
+                account: account, status: 'pending', createdAt: Date.now()
             });
+            
             document.getElementById('wdAlert').className = 'alert alert-success';
-            document.getElementById('wdAlert').innerText = '✅ Request sent!';
+            document.getElementById('wdAlert').innerText = '✅ Request sent! ' + finalTaka.toFixed(2) + '৳ পাবেন (চার্জ বাদ দিয়ে)।';
             const snap = await usersRef.child(currentUser.uid).once('value');
             currentUserData = snap.val() || currentUserData;
-            setTimeout(() => { closeModal('withdrawModal'); renderProfile(); }, 1500);
+            setTimeout(() => { closeModal('withdrawModal'); renderProfile(); }, 2000);
         });
         openModal('withdrawModal');
     };
